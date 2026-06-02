@@ -14,8 +14,8 @@ import { NextResponse } from 'next/server'
  *
  * Environment variables (set in .env.local locally + in Vercel dashboard):
  *   RESEND_API_KEY         (required)
- *   CONTACT_FROM           (optional, defaults to onboarding only while unverified)
- *   CONTACT_TO             (optional, defaults to the value below)
+ *   CONTACT_FROM           (required for production - use Punycode + unicode display name)
+ *   CONTACT_TO             (required for production)
  *
  * IMPORTANT for non-ASCII domains like højfynsspartel.dk:
  * Use Punycode (ASCII) version in the email address part of FROM/TO to avoid
@@ -33,13 +33,12 @@ import { NextResponse } from 'next/server'
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
-const FROM_EMAIL = process.env.CONTACT_FROM || 'onboarding@resend.dev'
-const TO_EMAIL = process.env.CONTACT_TO 
-  ? process.env.CONTACT_TO 
-  : (() => { 
-      console.warn('[contact] CONTACT_TO not set in env – using test fallback fastfun50@gmail.com. Set it in Vercel for production!'); 
-      return 'fastfun50@gmail.com'; 
-    })();
+const FROM_EMAIL = process.env.CONTACT_FROM
+const TO_EMAIL = process.env.CONTACT_TO
+
+if (!FROM_EMAIL || !TO_EMAIL) {
+  console.error('[contact] Missing CONTACT_FROM or CONTACT_TO in env. These are required for production.')
+}
 
 export async function POST(request: Request) {
   if (!RESEND_API_KEY) {
@@ -111,7 +110,7 @@ export async function POST(request: Request) {
       // Helpful hint for common test restriction error
       const errMsg = (error as any)?.message || ''
       if (errMsg.includes('testing emails') || errMsg.includes('your own email') || errMsg.includes('verified') || errMsg.includes('Invalid \'from\' field')) {
-        console.error('[contact] HINT: Resend test mode restriction. You can only send to your Resend account email (fastfun50@gmail.com) until you verify the domain at https://resend.com/domains. IMPORTANT: Use PUNYCODE (ASCII) in the email address, e.g. info@xn--hjfynsspartel-bnb.dk for højfynsspartel.dk (non-ASCII causes \'Invalid from field\'). Set CONTACT_TO back to fastfun50@gmail.com temporarily, or verify the domain and use a from-address on your domain.')
+        console.error('[contact] HINT: Resend restriction - verify your domain at https://resend.com/domains first. Use PUNYCODE (ASCII) in the email address part (e.g. info@xn--hjfynsspartel-bnb.dk). Non-ASCII in the address part causes "Invalid from field".')
       }
 
       // Never expose internal Resend details to the visitor
