@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   if (!apiKey) {
     console.error('[contact] RESEND_API_KEY is missing. Set it in .env.local (local) or in your hosting platform env vars.')
     return NextResponse.json(
-      { success: false, error: 'Der opstod en konfigurationsfejl. Kontakt os venligst på telefon.' },
+      { success: false, error: 'Konfigurationsfejl: RESEND_API_KEY mangler for dette miljø (Production/Preview).' },
       { status: 500 }
     )
   }
@@ -79,7 +79,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Der opstod en fejl ved afsendelse af beskeden.',
+          // TEMP: put the real cause in the main error field so the toast shows it immediately
+          error: `Resend fejl: ${debugInfo.name} - ${debugInfo.message}`,
           debug: debugInfo
         },
         { status: 500 }
@@ -93,7 +94,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Der opstod en uventet fejl. Prøv venligst igen.',
+        // TEMP: surface real cause
+        error: `Uventet fejl: ${error instanceof Error ? error.message : String(error)}`,
         debug: { message: error instanceof Error ? error.message : String(error) }
       },
       { status: 500 }
