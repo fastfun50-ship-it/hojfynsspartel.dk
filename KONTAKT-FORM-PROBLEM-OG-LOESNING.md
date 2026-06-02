@@ -135,9 +135,10 @@ Alt er additive og ændrer ikke på den fungerende formular.
 1. **I Vercel Dashboard** (https://vercel.com):
    - Gå til dit projekt "hojfnysspartel-dk".
    - Klik **Settings** (øverst) > **Domains** (i venstre menu).
-   - Tilføj domæne: højfynsspartel.dk
-   - Tilføj også www.højfynsspartel.dk (anbefalet for redirects).
-   - Vercel viser nu præcise DNS-instruktioner (A-record og CNAME). 
+   - Tilføj domænerne **en ad gangen** (du kan ikke skrive begge i samme felt):
+     - Først: `højfynsspartel.dk` (apex)
+     - Så klik "Add Existing" igen og tilføj: `www.højfynsspartel.dk`
+   - Når begge er tilføjet, viser Vercel præcise DNS-instruktioner (A-record og CNAME) for hver.
      - Typisk:
        - For apex (@ eller højfynsspartel.dk): A record til 76.76.21.21 (Vercels IP).
        - For www: CNAME til cname.vercel-dns.com (eller dit projekts .vercel.app target).
