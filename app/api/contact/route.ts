@@ -22,7 +22,12 @@ import { NextResponse } from 'next/server'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const FROM_EMAIL = process.env.CONTACT_FROM || 'onboarding@resend.dev'
-const TO_EMAIL = process.env.CONTACT_TO || 'fastfun50@gmail.com' // fallback for test mode only
+const TO_EMAIL = process.env.CONTACT_TO 
+  ? process.env.CONTACT_TO 
+  : (() => { 
+      console.warn('[contact] CONTACT_TO not set in env – using test fallback fastfun50@gmail.com. Set it in Vercel for production!'); 
+      return 'fastfun50@gmail.com'; 
+    })();
 
 export async function POST(request: Request) {
   if (!RESEND_API_KEY) {
