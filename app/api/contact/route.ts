@@ -17,6 +17,13 @@ import { NextResponse } from 'next/server'
  *   CONTACT_FROM           (optional, defaults to onboarding only while unverified)
  *   CONTACT_TO             (optional, defaults to the value below)
  *
+ * IMPORTANT for non-ASCII domains like højfynsspartel.dk:
+ * Use Punycode (ASCII) version in the email address part of FROM/TO to avoid
+ * "Invalid 'from' field. The email address contains non-ASCII characters."
+ * e.g. info@xn--hjfynsspartel-bnb.dk
+ * Display name can have unicode: "Højfynsspartel <info@xn--hjfynsspartel-bnb.dk>"
+ * Get punycode: node -e "console.log(require('punycode').toASCII('højfynsspartel.dk'))"
+ *
  * See .env.example for recommended values.
  */
 
