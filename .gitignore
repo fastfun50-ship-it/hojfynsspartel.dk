@@ -44,3 +44,8 @@ next-env.d.ts
 
 # Gamle billeder (ikke n�dvendige i repoet)
 images/
+
+# Temporary debugging / fix notes
+*-FORM-FIX*.md
+*-fix-guide*.txt
+DNS-RECORDS-FOR-RESEND.txt
