@@ -90,7 +90,27 @@ Dette fikser både sending, korrekt modtager, ingen non-ASCII fejl og stabil UX.
 
 ## Flytning af domæne (højfynsspartel.dk) til Vercel / denne side
 
-**Svar: Ja, I skal flytte/pointere domænet til denne Vercel-side for at få den rigtige branded URL live (i stedet for hojfnysspartel-dk.vercel.app).**
+**Spørgsmål: Domænet ligger på Simply.com – er det en god idé at flytte hele DNS-styringen (nameservers) over på Vercel?**
+
+**Svar: Nej – behold DNS på Simply.com og peg kun websitet (A + CNAME).**  
+Det er den sikreste løsning når I har email (info@højfynsspartel.dk) hos Simply.
+
+**Hvorfor ikke flytte hele domænet til Vercel?**
+- Email-modtagelse styres af MX-records på Simply.
+- Ved nameserver-skift skal I kopiere **alle** records (MX, SPF, DKIM, TXT, osv.) perfekt over til Vercel.
+- Én fejl = email stopper med at virke for kunderne.
+- For en lille håndværksvirksomhed er det unødvendig risiko.
+
+**Den rigtige måde (anbefalet):**
+- Tilføj domænet i Vercel (så siden "bor" på Vercel).
+- Opdater **kun** A-record (apex) og CNAME (www) hos Simply.com til de værdier Vercel viser.
+- Lad MX, alle TXT og alt andet være præcis som det er.
+
+Dette flytter hjemmesiden til https://højfynsspartel.dk uden at røre email overhovedet.
+
+---
+
+**Svar på det oprindelige spørgsmål: Ja, I skal flytte/pointere domænet til denne Vercel-side for at få den rigtige branded URL live (i stedet for hojfnysspartel-dk.vercel.app).**
 
 Dette gør siden tilgængelig på https://højfynsspartel.dk (og www hvis ønsket).
 
