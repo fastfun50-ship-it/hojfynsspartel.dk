@@ -24,6 +24,11 @@ import { NextResponse } from 'next/server'
  * Display name can have unicode: "Højfynsspartel <info@xn--hjfynsspartel-bnb.dk>"
  * Get punycode: node -e "console.log(require('punycode').toASCII('højfynsspartel.dk'))"
  *
+ * In Vercel edit UI for these sensitive vars (value field is blank on edit):
+ *   CONTACT_FROM Value: Højfynsspartel <info@xn--hjfynsspartel-bnb.dk>
+ *   CONTACT_TO Value: info@xn--hjfynsspartel-bnb.dk
+ * (Re-type or paste the value; copy-paste usually works but re-enter if UI blocks.)
+ *
  * See .env.example for recommended values.
  */
 
