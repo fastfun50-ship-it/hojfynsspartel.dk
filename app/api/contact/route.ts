@@ -89,8 +89,6 @@ export async function POST(request: Request) {
       )
     }
 
-    console.log(`[contact] Using FROM=${FROM_EMAIL} TO=${TO_EMAIL} (from env or fallback)`)
-
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [TO_EMAIL],
