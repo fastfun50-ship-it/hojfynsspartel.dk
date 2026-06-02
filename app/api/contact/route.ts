@@ -62,8 +62,20 @@ export async function POST(request: Request) {
       // Full error is logged server-side (Vercel Function Logs, or terminal during `npm run dev`).
       // Check the logs there to see the exact Resend error (e.g. invalid_from_address, missing permissions, etc).
       console.error('[contact] Resend send failed. Full error:', JSON.stringify(error, null, 2))
+      // Temporary: include Resend error details in the response so you can see the real cause
+      // directly in the browser Network tab / console when testing (owner only for now).
+      // We will harden this later to not expose internals to regular visitors.
       return NextResponse.json(
-        { success: false, error: 'Der opstod en fejl ved afsendelse af beskeden.' },
+        {
+          success: false,
+          error: 'Der opstod en fejl ved afsendelse af beskeden.',
+          debug: {
+            code: error.name,
+            message: error.message,
+            // full error object for deeper inspection
+            raw: error
+          }
+        },
         { status: 500 }
       )
     }
@@ -73,7 +85,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('[contact] Unexpected error in contact route:', error)
     return NextResponse.json(
-      { success: false, error: 'Der opstod en uventet fejl. Prøv venligst igen.' },
+      {
+        success: false,
+        error: 'Der opstod en uventet fejl. Prøv venligst igen.',
+        debug: { message: error instanceof Error ? error.message : String(error) }
+      },
       { status: 500 }
     )
   }
