@@ -20,9 +20,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: 'Højfynsspartel | Professionel spartling & maling på Fyn',
   description: 'Højfynsspartel v/ Michael Iversen. Uddannet bygningsmaler siden 2009. Vi leverer håndværk i særklasse – fuldspartling, filt, maling og facader på hele Fyn.',
-  icons: {
-    icon: '/favicon.svg',
-  },
+  // favicon handled automatically via app/favicon.ico
   openGraph: {
     title: 'Højfynsspartel | Professionel spartling & maling på Fyn',
     description: 'Håndværk der holder. Finish der ses. 15+ års erfaring.',
