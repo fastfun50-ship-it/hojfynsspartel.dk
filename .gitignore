@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# but allow the example file so collaborators know what to set
+!.env.example
 
 # vercel
 .vercel
@@ -40,5 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Gamle billeder (ikke nødvendige i repoet)
+# Gamle billeder (ikke nï¿½dvendige i repoet)
 images/
