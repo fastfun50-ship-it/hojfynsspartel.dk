@@ -154,6 +154,11 @@ Alt er additive og ændrer ikke på den fungerende formular.
    - **Lad alle andre records være uændrede** (MX for email, TXT for SPF/DKIM/verificering, etc.).
    - Slet ikke gamle records.
 
+   **Vigtigt hvis du bruger "Forward / Viderestilling / Redirect" hos Simply:**
+   - Tilføj de nye A + CNAME records først.
+   - Sluk eller slet den gamle forward/viderestilling for både højfynsspartel.dk og www.højfynsspartel.dk (i samme omgang eller lige efter).
+   - Hvis du slukker forwarden **før** de nye records er sat og propagated, vil domænet vise fejl eller parked side for besøgende indtil DNS er opdateret.
+
 3. **Vent på propagation**:
    - DNS ændringer kan tage 5 minutter til 48 timer (ofte <1 time).
    - Tjek med tools som https://www.whatsmydns.net/ eller 
