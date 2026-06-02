@@ -52,6 +52,17 @@ export async function POST(request: Request) {
     )
   }
 
+  if (!FROM_EMAIL || !TO_EMAIL) {
+    console.error('[contact] Missing CONTACT_FROM or CONTACT_TO environment variable. These are required.')
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Der er en midlertidig teknisk fejl. Prøv venligst igen senere eller ring til os.',
+      },
+      { status: 500 }
+    )
+  }
+
   const resend = new Resend(RESEND_API_KEY)
 
   try {
