@@ -41,10 +41,14 @@ export async function POST(request: Request) {
       )
     }
 
-    // After domain verification, this from address (on your domain) will work for sending to any recipient.
+    // === TEMP DIAGNOSTIC MODE (for testing while domain is not verified) ===
+    // Using onboarding@resend.dev + sending only to the Resend account owner's email (fastfun50@gmail.com)
+    // allows us to test if the API key itself works.
+    // Once we confirm emails arrive, the permanent fix is to verify the domain at https://resend.com/domains
+    // and switch back to from: 'Højfynsspartel <info@højfynsspartel.dk>' (or your sending address).
     const { data, error } = await resend.emails.send({
-      from: 'Højfynsspartel <info@højfynsspartel.dk>',
-      to: ['info@højfynsspartel.dk'],
+      from: 'onboarding@resend.dev',
+      to: ['fastfun50@gmail.com'],   // TEMP: must be the email associated with your Resend account for test mode
       subject: `Ny henvendelse fra ${navn}`,
       replyTo: email,
       html: `
@@ -61,20 +65,22 @@ export async function POST(request: Request) {
     if (error) {
       // Full error is logged server-side (Vercel Function Logs, or terminal during `npm run dev`).
       // Check the logs there to see the exact Resend error (e.g. invalid_from_address, missing permissions, etc).
-      console.error('[contact] Resend send failed. Full error:', JSON.stringify(error, null, 2))
-      // Temporary: include Resend error details in the response so you can see the real cause
-      // directly in the browser Network tab / console when testing (owner only for now).
-      // We will harden this later to not expose internals to regular visitors.
+      console.error('[contact] Resend send failed. Full error object:', error)
+      // Safe debug info for browser devtools (works even if error object is special)
+      const debugInfo = {
+        name: (error as any)?.name || 'unknown',
+        message: (error as any)?.message || String(error),
+        // Some Resend errors have more fields
+        code: (error as any)?.code,
+        statusCode: (error as any)?.statusCode,
+      }
+      console.error('[contact] Resend error summary for debug:', debugInfo)
+
       return NextResponse.json(
         {
           success: false,
           error: 'Der opstod en fejl ved afsendelse af beskeden.',
-          debug: {
-            code: error.name,
-            message: error.message,
-            // full error object for deeper inspection
-            raw: error
-          }
+          debug: debugInfo
         },
         { status: 500 }
       )
