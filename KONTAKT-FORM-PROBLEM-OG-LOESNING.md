@@ -135,10 +135,12 @@ Alt er additive og ændrer ikke på den fungerende formular.
 1. **I Vercel Dashboard** (https://vercel.com):
    - Gå til dit projekt "hojfnysspartel-dk".
    - Klik **Settings** (øverst) > **Domains** (i venstre menu).
-   - Tilføj domænerne **en ad gangen** (du kan ikke skrive begge i samme felt):
-     - Først: `højfynsspartel.dk` (apex)
-     - Så klik "Add Existing" igen og tilføj: `www.højfynsspartel.dk`
-   - Når begge er tilføjet, viser Vercel præcise DNS-instruktioner (A-record og CNAME) for hver.
+   - Tilføj domænerne **en ad gangen** (eller brug "paste multiple domains, one per line" i tilføj-vinduet hvis du vil gøre begge på én gang):
+     - Brug de korrekte navne (med ø og å):
+       - `højfynsspartel.dk`
+       - `www.højfynsspartel.dk`
+     - I "Add Domains"-vinduet: Fjern fluebenet i "Redirect apex domains to www (recommended)" hvis du vil have primær adresse uden www (anbefalet – passer til din metadataBase og vercel.json som redirecter www → non-www).
+   - Når begge er tilføjet uden røde fejl, viser Vercel præcise DNS-instruktioner (A-record og CNAME) for hver.
      - Typisk:
        - For apex (@ eller højfynsspartel.dk): A record til 76.76.21.21 (Vercels IP).
        - For www: CNAME til cname.vercel-dns.com (eller dit projekts .vercel.app target).
