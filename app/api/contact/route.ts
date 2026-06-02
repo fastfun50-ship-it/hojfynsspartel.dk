@@ -1,38 +1,51 @@
 import { Resend } from 'resend'
 import { NextResponse } from 'next/server'
 
-// IMPORTANT: For the contact form emails to work to arbitrary recipients (info@højfynsspartel.dk etc),
-// you MUST verify a domain in the Resend dashboard: https://resend.com/domains
-//
-// Steps:
-// 1. Sign up / log in at resend.com
-// 2. Go to Domains → Add Domain (use højfynsspartel.dk or e.g. mail.højfynsspartel.dk for isolation)
-// 3. Copy the DNS records shown (usually 2x DKIM CNAME + update your SPF TXT to include Resend)
-// 4. Add the records at your DNS provider (the one hosting your domain)
-// 5. Wait for "Verified" status (usually 1-10 mins, sometimes longer)
-// 6. Then you can send from addresses on that domain to anyone.
-//
-// Until the domain is verified, you can only send TEST emails using from: onboarding@resend.dev
-// and ONLY TO the email address you signed up to Resend with.
-//
-// After verification, change the from below if desired (info@ is fine if you own the mailbox).
+/**
+ * Contact form email handler using Resend.
+ *
+ * CRITICAL SETUP (do this once):
+ * 1. Go to https://resend.com/domains and add + verify "højfynsspartel.dk"
+ *    (or use a subdomain like "mail.højfynsspartel.dk" for isolation).
+ * 2. Add the DKIM + SPF records at your DNS provider.
+ * 3. Wait for "Verified" status.
+ *
+ * Only AFTER domain verification can you send from info@højfynsspartel.dk to any recipient.
+ *
+ * Environment variables (set in .env.local locally + in Vercel dashboard):
+ *   RESEND_API_KEY         (required)
+ *   CONTACT_FROM           (optional, defaults to onboarding only while unverified)
+ *   CONTACT_TO             (optional, defaults to the value below)
+ *
+ * See .env.example for recommended values.
+ */
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+const FROM_EMAIL = process.env.CONTACT_FROM || 'onboarding@resend.dev'
+const TO_EMAIL = process.env.CONTACT_TO || 'fastfun50@gmail.com' // fallback for test mode only
 
 export async function POST(request: Request) {
-  const apiKey = process.env.RESEND_API_KEY
-
-  if (!apiKey) {
-    console.error('[contact] RESEND_API_KEY is missing. Set it in .env.local (local) or in your hosting platform env vars.')
+  if (!RESEND_API_KEY) {
+    console.error('[contact] Missing RESEND_API_KEY environment variable.')
     return NextResponse.json(
-      { success: false, error: 'Konfigurationsfejl: RESEND_API_KEY mangler for dette miljø (Production/Preview).' },
+      {
+        success: false,
+        error: 'Der er en midlertidig teknisk fejl. Prøv venligst igen senere eller ring til os.',
+      },
       { status: 500 }
     )
   }
 
-  const resend = new Resend(apiKey)
+  const resend = new Resend(RESEND_API_KEY)
 
   try {
     const body = await request.json()
-    const { navn, telefon, email, beskrivelse, starttidspunkt } = body
+
+    const navn = (body.navn || '').toString().trim()
+    const telefon = (body.telefon || '').toString().trim()
+    const email = (body.email || '').toString().trim()
+    const beskrivelse = (body.beskrivelse || '').toString().trim()
+    const starttidspunkt = body.starttidspunkt ? body.starttidspunkt.toString().trim() : undefined
 
     if (!navn || !telefon || !email || !beskrivelse) {
       return NextResponse.json(
@@ -41,47 +54,48 @@ export async function POST(request: Request) {
       )
     }
 
-    // === TEMP DIAGNOSTIC MODE (for testing while domain is not verified) ===
-    // Using onboarding@resend.dev + sending only to the Resend account owner's email (fastfun50@gmail.com)
-    // allows us to test if the API key itself works.
-    // Once we confirm emails arrive, the permanent fix is to verify the domain at https://resend.com/domains
-    // and switch back to from: 'Højfynsspartel <info@højfynsspartel.dk>' (or your sending address).
+    // Basic length / sanity limits (prevent abuse)
+    if (beskrivelse.length > 5000) {
+      return NextResponse.json(
+        { success: false, error: 'Din beskrivelse er for lang. Maks 5000 tegn.' },
+        { status: 400 }
+      )
+    }
+
+    console.log(`[contact] Using FROM=${FROM_EMAIL} TO=${TO_EMAIL} (from env or fallback)`)
+
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: ['fastfun50@gmail.com'],   // TEMP: must be the email associated with your Resend account for test mode
+      from: FROM_EMAIL,
+      to: [TO_EMAIL],
       subject: `Ny henvendelse fra ${navn}`,
       replyTo: email,
       html: `
-        <h2>Ny henvendelse fra hjemmesiden</h2>
+        <h2>Ny henvendelse fra højfynsspartel.dk</h2>
         <p><strong>Navn:</strong> ${navn}</p>
         <p><strong>Telefon:</strong> ${telefon}</p>
         <p><strong>Email:</strong> ${email}</p>
         ${starttidspunkt ? `<p><strong>Ønsket starttidspunkt:</strong> ${starttidspunkt}</p>` : ''}
         <p><strong>Beskrivelse af opgaven:</strong></p>
         <p>${beskrivelse.replace(/\n/g, '<br>')}</p>
+        <hr />
+        <p style="color:#666;font-size:12px;">Sendt via kontaktformularen på højfynsspartel.dk</p>
       `,
     })
 
     if (error) {
-      // Full error is logged server-side (Vercel Function Logs, or terminal during `npm run dev`).
-      // Check the logs there to see the exact Resend error (e.g. invalid_from_address, missing permissions, etc).
-      console.error('[contact] Resend send failed. Full error object:', error)
-      // Safe debug info for browser devtools (works even if error object is special)
-      const debugInfo = {
-        name: (error as any)?.name || 'unknown',
-        message: (error as any)?.message || String(error),
-        // Some Resend errors have more fields
+      // Log the REAL error server-side only (visible in Vercel Function Logs or `npm run dev`)
+      console.error('[contact] Resend send failed:', {
+        name: (error as any)?.name,
+        message: (error as any)?.message,
         code: (error as any)?.code,
         statusCode: (error as any)?.statusCode,
-      }
-      console.error('[contact] Resend error summary for debug:', debugInfo)
+      })
 
+      // Never expose internal Resend details to the visitor
       return NextResponse.json(
         {
           success: false,
-          // TEMP: put the real cause in the main error field so the toast shows it immediately
-          error: `Resend fejl: ${debugInfo.name} - ${debugInfo.message}`,
-          debug: debugInfo
+          error: 'Der opstod en fejl ved afsendelse af beskeden. Prøv venligst igen, eller ring til os på 21 63 17 93.',
         },
         { status: 500 }
       )
@@ -90,13 +104,11 @@ export async function POST(request: Request) {
     console.log('[contact] Email sent successfully. Resend id:', data?.id)
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('[contact] Unexpected error in contact route:', error)
+    console.error('[contact] Unexpected error:', error)
     return NextResponse.json(
       {
         success: false,
-        // TEMP: surface real cause
-        error: `Uventet fejl: ${error instanceof Error ? error.message : String(error)}`,
-        debug: { message: error instanceof Error ? error.message : String(error) }
+        error: 'Der opstod en uventet teknisk fejl. Prøv venligst igen eller kontakt os direkte.',
       },
       { status: 500 }
     )
