@@ -41,11 +41,18 @@ export function Contact() {
         toast.success('Tak! Vi vender tilbage inden for 24 timer.')
         e.currentTarget.reset()
       } else {
-        toast.error(result.error || 'Der opstod en fejl. Prøv venligst igen.')
+        // During debugging: surface the actual Resend error from debug if present
+        const debugMsg = result.debug?.message || result.debug?.name
+        const displayError = debugMsg
+          ? `Fejl fra Resend: ${debugMsg}`
+          : (result.error || 'Der opstod en fejl. Prøv venligst igen.')
+        toast.error(displayError)
+        console.error('[Contact] Full error response:', result)
       }
     } catch (error) {
       console.error('[Contact] Unexpected error:', error)
       toast.error('Der opstod en uventet fejl. Prøv venligst igen senere.')
+      console.error('[Contact] Full catch error:', error)
     } finally {
       setIsSubmitting(false)
     }
