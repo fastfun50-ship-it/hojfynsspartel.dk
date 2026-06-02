@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
+import { Toaster } from 'sonner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,6 +39,7 @@ export default function RootLayout({
     <html lang="da" className={`${inter.variable} ${playfair.variable}`}>
       <body className="bg-[#0A0A0A] text-[#F5F5F5] antialiased">
         {children}
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   )

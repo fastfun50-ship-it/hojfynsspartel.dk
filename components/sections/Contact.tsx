@@ -1,6 +1,78 @@
 'use client'
 
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 export function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    console.log('[Contact] Form submitted - handleSubmit fired')
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    
+    const data = {
+      navn: formData.get('navn') as string,
+      telefon: formData.get('telefon') as string,
+      email: formData.get('email') as string,
+      beskrivelse: formData.get('beskrivelse') as string,
+      starttidspunkt: formData.get('starttidspunkt') as string || undefined,
+    }
+
+    console.log('[Contact] Data to send:', data)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      console.log('[Contact] API response:', result)
+
+      if (response.ok && result.success) {
+        setIsSuccess(true)
+        toast.success('Tak! Vi vender tilbage inden for 24 timer.')
+        e.currentTarget.reset()
+      } else {
+        toast.error(result.error || 'Der opstod en fejl. Prøv venligst igen.')
+      }
+    } catch (error) {
+      console.error('[Contact] Unexpected error:', error)
+      toast.error('Der opstod en uventet fejl. Prøv venligst igen senere.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isSuccess) {
+    return (
+      <section id="kontakt" className="section border-t border-white/10 bg-[#0A0A0A]">
+        <div className="max-w-screen-2xl mx-auto px-8 md:px-16 text-center">
+          <div className="max-w-md mx-auto py-12">
+            <div className="text-6xl mb-6">✓</div>
+            <h2 className="text-4xl font-semibold tracking-tight mb-4">Tak for din henvendelse!</h2>
+            <p className="text-xl text-white/70">
+              Vi har modtaget din besked og vender tilbage inden for 24 timer på hverdage.
+            </p>
+            <button 
+              onClick={() => setIsSuccess(false)}
+              className="mt-8 text-sm text-[#C5A36E] hover:underline"
+            >
+              Send en ny besked
+            </button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section id="kontakt" className="section border-t border-white/10 bg-[#0A0A0A]">
       <div className="max-w-screen-2xl mx-auto px-8 md:px-16">
@@ -60,12 +132,13 @@ export function Contact() {
 
           {/* Contact Form */}
           <div>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs tracking-widest text-white/60 mb-2">NAVN</label>
                   <input 
                     type="text" 
+                    name="navn"
                     required
                     className="w-full bg-[#111111] border border-white/20 rounded-2xl px-5 py-3.5 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none transition-colors"
                     placeholder="Anders Jensen"
@@ -75,6 +148,7 @@ export function Contact() {
                   <label className="block text-xs tracking-widest text-white/60 mb-2">TELEFON</label>
                   <input 
                     type="tel" 
+                    name="telefon"
                     required
                     className="w-full bg-[#111111] border border-white/20 rounded-2xl px-5 py-3.5 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none transition-colors"
                     placeholder="21 63 17 93"
@@ -86,6 +160,7 @@ export function Contact() {
                 <label className="block text-xs tracking-widest text-white/60 mb-2">E-MAIL</label>
                 <input 
                   type="email" 
+                  name="email"
                   required
                   className="w-full bg-[#111111] border border-white/20 rounded-2xl px-5 py-3.5 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none transition-colors"
                   placeholder="din@email.dk"
@@ -95,6 +170,7 @@ export function Contact() {
               <div>
                 <label className="block text-xs tracking-widest text-white/60 mb-2">BESKRIV DIN OPGAVE</label>
                 <textarea 
+                  name="beskrivelse"
                   required
                   rows={6}
                   className="w-full bg-[#111111] border border-white/20 rounded-3xl px-5 py-4 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none transition-colors resize-y"
@@ -106,6 +182,7 @@ export function Contact() {
                 <label className="block text-xs tracking-widest text-white/60 mb-2">ØNSKET STARTTIDSPUNKT (valgfrit)</label>
                 <input 
                   type="text" 
+                  name="starttidspunkt"
                   className="w-full bg-[#111111] border border-white/20 rounded-2xl px-5 py-3.5 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none transition-colors"
                   placeholder="Snarest / i løbet af september / efter 15. oktober"
                 />
@@ -113,9 +190,10 @@ export function Contact() {
 
               <button 
                 type="submit"
-                className="w-full mt-4 h-14 rounded-2xl bg-[#C5A36E] text-[#0A0A0A] font-semibold text-base hover:bg-[#D4B47F] transition-all active:scale-[0.985]"
+                disabled={isSubmitting}
+                className="w-full mt-4 h-14 rounded-2xl bg-[#C5A36E] text-[#0A0A0A] font-semibold text-base hover:bg-[#D4B47F] transition-all active:scale-[0.985] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Send besked — vi vender tilbage hurtigt
+                {isSubmitting ? 'Sender besked...' : 'Send besked — vi vender tilbage hurtigt'}
               </button>
 
               <p className="text-center text-xs text-white/50 pt-2">
