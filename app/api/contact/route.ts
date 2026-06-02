@@ -32,9 +32,9 @@ import { NextResponse } from 'next/server'
  * See .env.example for recommended values.
  */
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY
-const FROM_EMAIL = process.env.CONTACT_FROM
-const TO_EMAIL = process.env.CONTACT_TO
+const RESEND_API_KEY = process.env.RESEND_API_KEY!
+const FROM_EMAIL = process.env.CONTACT_FROM!
+const TO_EMAIL = process.env.CONTACT_TO!
 
 if (!FROM_EMAIL || !TO_EMAIL) {
   console.error('[contact] Missing CONTACT_FROM or CONTACT_TO in env. These are required for production.')
