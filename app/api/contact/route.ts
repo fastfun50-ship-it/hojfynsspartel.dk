@@ -96,6 +96,12 @@ export async function POST(request: Request) {
         statusCode: (error as any)?.statusCode,
       })
 
+      // Helpful hint for common test restriction error
+      const errMsg = (error as any)?.message || ''
+      if (errMsg.includes('testing emails') || errMsg.includes('your own email') || errMsg.includes('verified')) {
+        console.error('[contact] HINT: Resend test mode restriction. You can only send to your Resend account email (fastfun50@gmail.com) until you verify the domain at https://resend.com/domains. Set CONTACT_TO back to fastfun50@gmail.com temporarily, or verify the domain and use a from-address on your domain.')
+      }
+
       // Never expose internal Resend details to the visitor
       return NextResponse.json(
         {
