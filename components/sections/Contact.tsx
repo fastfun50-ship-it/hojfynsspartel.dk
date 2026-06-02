@@ -12,7 +12,9 @@ export function Contact() {
     console.log('[Contact] Form submitted - handleSubmit fired')
     setIsSubmitting(true)
 
-    const formData = new FormData(e.currentTarget)
+    // Capture the form synchronously before any awaits (React event pooling can null currentTarget after async)
+    const form = e.currentTarget
+    const formData = new FormData(form)
     
     const data = {
       navn: formData.get('navn') as string,
@@ -39,20 +41,19 @@ export function Contact() {
       if (response.ok && result.success) {
         setIsSuccess(true)
         toast.success('Tak! Vi vender tilbage inden for 24 timer.')
-        e.currentTarget.reset()
+        if (form && typeof form.reset === 'function') {
+          form.reset()
+        }
       } else {
-        // During debugging: surface the actual Resend error from debug if present
-        const debugMsg = result.debug?.message || result.debug?.name
-        const displayError = debugMsg
-          ? `Fejl fra Resend: ${debugMsg}`
-          : (result.error || 'Der opstod en fejl. Prøv venligst igen.')
-        toast.error(displayError)
-        console.error('[Contact] Full error response:', result)
+        // Show only the friendly message from the server. Full details are logged server-side.
+        const friendlyError =
+          result?.error || 'Der opstod en fejl. Prøv venligst igen eller ring til os på 21 63 17 93.'
+        toast.error(friendlyError)
+        console.error('[Contact] API error response:', result)
       }
     } catch (error) {
-      console.error('[Contact] Unexpected error:', error)
-      toast.error('Der opstod en uventet fejl. Prøv venligst igen senere.')
-      console.error('[Contact] Full catch error:', error)
+      console.error('[Contact] Network / unexpected error:', error)
+      toast.error('Der opstod en uventet fejl. Prøv venligst igen eller ring til os på 21 63 17 93.')
     } finally {
       setIsSubmitting(false)
     }
