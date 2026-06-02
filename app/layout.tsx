@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Højfynsspartel | Professionel spartling & maling på Fyn',
     description: 'Håndværk der holder. Finish der ses. 15+ års erfaring.',
-    images: [{ url: '/og-image.jpg' }],
+    images: [{ url: '/hero-poster.jpg' }],
   },
 }
 
