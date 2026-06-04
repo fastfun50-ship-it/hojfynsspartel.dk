@@ -1,5 +1,7 @@
 import { Resend } from 'resend'
 import { NextResponse } from 'next/server'
+import { siteConfig } from '@/config/site.config'
+import { addInquiry } from '@/lib/cms'
 
 /**
  * Contact form email handler using Resend.
@@ -126,13 +128,27 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Der opstod en fejl ved afsendelse af beskeden. Prøv venligst igen, eller ring til os på 21 63 17 93.',
+          error: `Der opstod en fejl ved afsendelse af beskeden. Prøv venligst igen, eller ring til os på ${siteConfig.contact.phone}.`,
         },
         { status: 500 }
       )
     }
 
     console.log('[contact] Email sent successfully. Resend id:', data?.id)
+
+    // Also log to CMS so Michael can see all leads in /admin
+    try {
+      await addInquiry({
+        navn,
+        telefon,
+        email,
+        beskrivelse,
+        starttidspunkt: starttidspunkt || undefined,
+      })
+    } catch (logErr) {
+      console.error('[contact] Failed to log inquiry to CMS (non-fatal):', logErr)
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('[contact] Unexpected error:', error)

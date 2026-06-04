@@ -1,59 +1,40 @@
-'use client'
+import type { Project } from '@/types/cms'
 
-type Project = {
-  id: number
-  title: string
-  location: string
-  category: string
-  challenge: string
-  approach: string
-  result: string
-  images: string[]
+interface SelectedWorkProps {
+  projects: Project[]
+  title?: string
+  headline?: string
+  description?: string
+  showFullListLink?: boolean
 }
 
-const projects: Project[] = [
-  {
-    id: 1,
-    title: "Stort erhvervsbyggeri",
-    location: "Fyn",
-    category: "Erhverv",
-    challenge: "Der skulle spartles store flader i en aktiv byggeplads med stramme tidsplaner og høje krav til ensartethed.",
-    approach: "Vi lagde en klar plan for etaper, daglig oprydning og tæt dialog med de andre håndværkere på pladsen for at undgå forsinkelser.",
-    result: "Fladerne blev leveret til tiden og med en ensartet finish, som maleren kunne arbejde videre med uden ekstra forberedelse.",
-    images: [
-      "/images/projects/commercial/commercial-hall-plastering-01.jpg",
-      "/images/projects/commercial/commercial-hall-plastering-02.jpg",
-      "/images/projects/commercial/commercial-hall-plastering-03.jpg",
-    ],
-  },
-  {
-    id: 2,
-    title: "Før og efter – privat bolig",
-    location: "Fyn",
-    category: "Renovering",
-    challenge: "De eksisterende vægge var ujævne med gamle lag spartelmasse og tapet. Kunden ville have helt glatte overflader uden at skulle starte forfra.",
-    approach: "Vi gennemgik væggene grundigt, fjernede det nødvendige og byggede nye, plane overflader op med flere lag og mellemslibninger.",
-    result: "Væggene blev helt glatte og ensartede. Kunden kunne efterfølgende male selv uden at skulle bruge tid på yderligere forberedelse.",
-    images: [
-      "/images/projects/before-after/before-01.jpg",
-      "/images/projects/before-after/after-01.jpg",
-    ],
-  },
-]
+export function SelectedWork({ 
+  projects, 
+  title = "UDVALGT ARBEJDE",
+  headline = "Ikke mængde.<br />Kvalitet og gennemsigtighed.",
+  description = "Vi viser ikke alt, vi laver. Her er nogle af de opgaver, der bedst viser, hvordan vi arbejder, og hvad du kan forvente.",
+  showFullListLink = true 
+}: SelectedWorkProps) {
+  if (!projects || projects.length === 0) {
+    return (
+      <section id="arbejde" className="section border-t border-white/10 bg-[var(--background)]">
+        <div className="max-w-screen-2xl mx-auto px-8 md:px-16 text-white/60">
+          Ingen projekter at vise endnu.
+        </div>
+      </section>
+    )
+  }
 
-export function SelectedWork() {
   return (
-    <section id="arbejde" className="section border-t border-white/10 bg-[#0A0A0A]">
+    <section id="arbejde" className="section border-t border-white/10 bg-[var(--background)]">
       <div className="max-w-screen-2xl mx-auto px-8 md:px-16">
         
         {/* Header */}
         <div className="max-w-3xl mb-12">
-          <span className="text-xs tracking-[3px] text-white/50">UDVALGT ARBEJDE</span>
-          <h2 className="text-5xl md:text-6xl tracking-[-2.5px] font-semibold mt-4 leading-none">
-            Ikke mængde.<br />Kvalitet og gennemsigtighed.
-          </h2>
+          <span className="text-xs tracking-[3px] text-white/50">{title}</span>
+          <h2 className="text-5xl md:text-6xl tracking-[-2.5px] font-semibold mt-4 leading-none" dangerouslySetInnerHTML={{ __html: headline }} />
           <p className="mt-6 text-xl text-white/70">
-            Vi viser ikke alt, vi laver. Her er nogle af de opgaver, der bedst viser, hvordan vi arbejder, og hvad du kan forvente.
+            {description}
           </p>
         </div>
 
@@ -62,22 +43,72 @@ export function SelectedWork() {
           {projects.map((project) => (
             <div key={project.id} className="grid md:grid-cols-12 gap-x-12 gap-y-8 items-start">
               
-              {/* Images */}
+              {/* Images - understøtter før/efter med labels. For klassiske før/efter projekter vises de side om side. */}
               <div className="md:col-span-7">
-                <div className="grid grid-cols-1 gap-3">
-                  {project.images.map((img, index) => (
-                    <div 
-                      key={index} 
-                      className="relative aspect-[16/10] bg-zinc-900 rounded-3xl overflow-hidden border border-white/10"
-                    >
-                      <img 
-                        src={img} 
-                        alt={`${project.title} - billede ${index + 1}`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
+                {(project.beforeImages?.length || project.afterImages?.length) ? (
+                  (project.beforeImages?.length && project.afterImages?.length) ? (
+                    // Side-by-side for før/efter sammenligning
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-[10px] tracking-[2px] text-white/40 mb-1.5 pl-1">FØR</div>
+                        <div className="space-y-2">
+                          {project.beforeImages.map((img, index) => (
+                            <div key={`before-${index}`} className="relative aspect-[16/10] bg-[var(--surface)] rounded-3xl overflow-hidden border border-white/10">
+                              <img src={img} alt={`${project.title} - før ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] tracking-[2px] text-white/40 mb-1.5 pl-1">EFTER</div>
+                        <div className="space-y-2">
+                          {project.afterImages.map((img, index) => (
+                            <div key={`after-${index}`} className="relative aspect-[16/10] bg-[var(--surface)] rounded-3xl overflow-hidden border border-white/10">
+                              <img src={img} alt={`${project.title} - efter ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  ) : (
+                    // Stacked hvis kun før eller kun efter
+                    <div className="space-y-4">
+                      {project.beforeImages && project.beforeImages.length > 0 && (
+                        <div>
+                          <div className="text-[10px] tracking-[2px] text-white/40 mb-1.5 pl-1">FØR</div>
+                          <div className="grid grid-cols-1 gap-3">
+                            {project.beforeImages.map((img, index) => (
+                              <div key={`before-${index}`} className="relative aspect-[16/10] bg-[var(--surface)] rounded-3xl overflow-hidden border border-white/10">
+                                <img src={img} alt={`${project.title} - før ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {project.afterImages && project.afterImages.length > 0 && (
+                        <div>
+                          <div className="text-[10px] tracking-[2px] text-white/40 mb-1.5 pl-1">EFTER</div>
+                          <div className="grid grid-cols-1 gap-3">
+                            {project.afterImages.map((img, index) => (
+                              <div key={`after-${index}`} className="relative aspect-[16/10] bg-[var(--surface)] rounded-3xl overflow-hidden border border-white/10">
+                                <img src={img} alt={`${project.title} - efter ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                ) : (
+                  // Fallback for gamle projekter
+                  <div className="grid grid-cols-1 gap-3">
+                    {(project as any).images?.map((img: string, index: number) => (
+                      <div key={index} className="relative aspect-[16/10] bg-[var(--surface)] rounded-3xl overflow-hidden border border-white/10">
+                        <img src={img} alt={`${project.title} - billede ${index + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Text content */}
@@ -94,17 +125,17 @@ export function SelectedWork() {
 
                 <div className="space-y-6 text-[15px] leading-relaxed text-white/80">
                   <div>
-                    <div className="text-[#C5A36E] text-sm tracking-wider mb-1.5">UDFORDRINGEN</div>
+                    <div className="text-[var(--gold)] text-sm tracking-wider mb-1.5">UDFORDRINGEN</div>
                     <p>{project.challenge}</p>
                   </div>
 
                   <div>
-                    <div className="text-[#C5A36E] text-sm tracking-wider mb-1.5">SÅDAN GREB VI DET AN</div>
+                    <div className="text-[var(--gold)] text-sm tracking-wider mb-1.5">SÅDAN GREB VI DET AN</div>
                     <p>{project.approach}</p>
                   </div>
 
                   <div>
-                    <div className="text-[#C5A36E] text-sm tracking-wider mb-1.5">RESULTATET</div>
+                    <div className="text-[var(--gold)] text-sm tracking-wider mb-1.5">RESULTATET</div>
                     <p>{project.result}</p>
                   </div>
                 </div>
@@ -115,19 +146,16 @@ export function SelectedWork() {
         </div>
 
         {/* Bottom note */}
-        <div className="mt-16 pt-10 border-t border-white/10 max-w-2xl">
-          <p className="text-white/70">
-            Dette er kun et udvalg. Når vi har flere billeder klar, udvider vi sektionen med flere projekter og flere detaljer.
-          </p>
-          <a 
-            href="#kontakt" 
-            className="inline-block mt-5 text-sm font-medium text-[#C5A36E] hover:underline"
-          >
-            Kontakt os om dit projekt →
-          </a>
-        </div>
+        {showFullListLink && (
+          <div className="mt-16 pt-10 border-t border-white/10 max-w-2xl">
+            <p className="text-white/70">
+              Dette er kun et udvalg. Brug "Se mere" i menuen ovenfor for at se flere projekter.
+            </p>
+          </div>
+        )}
 
       </div>
     </section>
   )
 }
+

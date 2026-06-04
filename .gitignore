@@ -49,3 +49,9 @@ images/
 *-FORM-FIX*.md
 *-fix-guide*.txt
 DNS-RECORDS-FOR-RESEND.txt
+
+# CMS uploads (local dev fallback only — prod uses Vercel Blob)
+public/uploads/
+
+# Prisma (if re-added later)
+/app/generated/prisma

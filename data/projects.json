@@ -1,0 +1,49 @@
+[
+  {
+    "id": 1,
+    "title": "Stort erhvervsbyggeri",
+    "location": "Fyn",
+    "category": "Erhverv",
+    "challenge": "Der skulle spartles store flader i en aktiv byggeplads med stramme tidsplaner og høje krav til ensartethed.",
+    "approach": "Vi lagde en klar plan for etaper, daglig oprydning og tæt dialog med de andre håndværkere på pladsen for at undgå forsinkelser.",
+    "result": "Fladerne blev leveret til tiden og med en ensartet finish, som maleren kunne arbejde videre med uden ekstra forberedelse.",
+    "beforeImages": [],
+    "afterImages": [
+      "/images/projects/commercial/commercial-hall-plastering-01.jpg",
+      "/images/projects/commercial/commercial-hall-plastering-02.jpg",
+      "/images/projects/commercial/commercial-hall-plastering-03.jpg"
+    ],
+    "order": 1,
+    "featuredOnHome": true
+  },
+  {
+    "id": 2,
+    "title": "Før og efter – privat bolig",
+    "location": "Fyn",
+    "category": "Renovering",
+    "challenge": "De eksisterende vægge var ujævne med gamle lag spartelmasse og tapet. Kunden ville have helt glatte overflader uden at skulle starte forfra.",
+    "approach": "Vi gennemgik væggene grundigt, fjernede det nødvendige og byggede nye, plane overflader op med flere lag og mellemslibninger.",
+    "result": "Væggene blev helt glatte og ensartede. Kunden kunne efterfølgende male selv uden at skulle bruge tid på yderligere forberedelse.",
+    "beforeImages": [
+      "/images/projects/before-after/before-01.jpg"
+    ],
+    "afterImages": [
+      "/images/projects/before-after/after-01.jpg"
+    ],
+    "order": 2,
+    "featuredOnHome": true
+  },
+  {
+    "title": "Nyt projekt",
+    "location": "Fyn",
+    "category": "Renovering",
+    "challenge": "Beskriv udfordringen her...",
+    "approach": "Sådan greb vi det an...",
+    "result": "Resultatet blev...",
+    "beforeImages": [],
+    "afterImages": [],
+    "id": 3,
+    "order": 3,
+    "featuredOnHome": false
+  }
+]

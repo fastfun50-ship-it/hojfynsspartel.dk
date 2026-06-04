@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "number": "01",
+    "title": "Gennemgang & forventningsafstemning",
+    "description": "Vi møder dig på stedet og lytter til, hvad der er vigtigt for dig. Vi gennemgår opgaven realistisk og er ærlige om, hvad der skal til for at opnå det resultat, du ønsker – uden at love noget vi ikke kan holde.",
+    "order": 1
+  },
+  {
+    "id": 2,
+    "number": "02",
+    "title": "Forberedelse – det usynlige arbejde",
+    "description": "Når vi aftaler at spartle et rum, for eksempel en stue, så har vi også aftalt, at rummet skal være ryddet. Det gør vi både for at beskytte dine ting og fordi vi ikke er flyttefolk. Vi afdækker grundigt og sørger for, at underlaget er klar, før vi går i gang.",
+    "order": 2
+  },
+  {
+    "id": 3,
+    "number": "03",
+    "title": "Udførelse med omhu",
+    "description": "Vi arbejder systematisk og metodisk. Ingen genveje. Vi bruger de rette materialer og teknikker til netop din opgave og kontrollerer løbende kvaliteten undervejs – ikke kun til sidst.",
+    "order": 3
+  },
+  {
+    "id": 4,
+    "number": "04",
+    "title": "Aflevering & tryghed",
+    "description": "Vi er ikke færdige, før du er tilfreds. Vi gennemgår sammen, rydder op og sikrer, at du forstår, hvordan overfladerne skal vedligeholdes. Du får også klar besked om, hvad du kan forvente fremover.",
+    "order": 4
+  }
+]

@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { getSiteContent, getProjects } from '@/lib/cms'
+import { SeMoreModal } from '@/components/project/SeMoreModal'
+import { DEFAULT_COLORS } from '@/types/cms'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,30 +20,51 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://højfynsspartel.dk'),
-  title: 'Højfynsspartel | Professionel spartling & maling på Fyn',
-  description: 'Højfynsspartel v/ Michael Iversen. Uddannet bygningsmaler siden 2009. Vi leverer håndværk i særklasse – fuldspartling, filt, maling og facader på hele Fyn.',
-  icons: {
-    icon: '/favicon.ico',
-  },
-  openGraph: {
-    title: 'Højfynsspartel | Professionel spartling & maling på Fyn',
-    description: 'Håndværk der holder. Finish der ses. 15+ års erfaring.',
-    images: [{ url: '/hero-poster.jpg' }],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getSiteContent()
+  return {
+    metadataBase: new URL('https://højfynsspartel.dk'),
+    title: content.metadata.title,
+    description: content.metadata.description,
+    icons: {
+      icon: '/favicon.ico',
+    },
+    openGraph: {
+      title: content.metadata.title,
+      description: content.metadata.description,
+      images: [{ url: content.metadata.ogImage }],
+    },
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const [content, projects] = await Promise.all([
+    getSiteContent(),
+    getProjects()
+  ])
+  const themeColors = content.colors || DEFAULT_COLORS
   return (
     <html lang="da" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="bg-[#0A0A0A] text-[#F5F5F5] antialiased">
+      <body className="bg-[var(--background)] text-[var(--text-primary)] antialiased">
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --background: ${themeColors.background};
+            --surface: ${themeColors.surface};
+            --surface-2: ${themeColors.surface2 || '#1C1C1C'};
+            --border: ${themeColors.border || '#252525'};
+            --text-primary: ${themeColors.textPrimary || '#F5F5F5'};
+            --text-muted: ${themeColors.textMuted || '#A1A1AA'};
+            --gold: ${themeColors.accent};
+            --gold-hover: ${themeColors.accentHover};
+          }
+        ` }} />
         {children}
         <Toaster position="top-center" richColors closeButton />
+        <SeMoreModal projects={projects} />
       </body>
     </html>
   )

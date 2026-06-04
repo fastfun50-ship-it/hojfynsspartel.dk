@@ -1,0 +1,62 @@
+{
+  "company": {
+    "name": "Højfynsspartel",
+    "fullName": "Højfynsspartel & Maling",
+    "owner": "Michael Iversen",
+    "founded": 2009,
+    "tagline": "Professionel spartling & maling på Fyn",
+    "description": "Erfaren bygningsmaler med fokus på høj kvalitet, ærlighed og godt håndværk.",
+    "cvr": "41620730"
+  },
+  "contact": {
+    "phone": "21 63 17 93",
+    "email": "info@højfynsspartel.dk",
+    "address": "Vissenbjerg, Fyn",
+    "area": "Hele Fyn samt opgaver på Sjælland og i Jylland efter aftale."
+  },
+  "metadata": {
+    "title": "Højfynsspartel | Professionel Spartling & Maling på Fyn",
+    "description": "Michael Iversen – erfaren bygningsmaler siden 2009. Specialiseret i spartling, pudsning og kvalitetsmaling på hele Fyn.",
+    "keywords": [
+      "spartling",
+      "maler",
+      "Fyn",
+      "Odense",
+      "bygningsmaler",
+      "facademaling",
+      "Vissenbjerg"
+    ],
+    "ogImage": "/hero-poster.jpg"
+  },
+  "hero": {
+    "locationLabel": "VISSENBJERG • FYN",
+    "headline1": "Vi laver ikke",
+    "headline2": "vægge.",
+    "headlineAccent": "Vi laver ro.",
+    "subheadline": "15 års erfaring. Intet kompromis.\nKun det arbejde vi selv ville være stolte af.",
+    "ctaPrimary": "Få et tilbud",
+    "ctaSecondary": "Se udvalgte arbejder"
+  },
+  "about": {
+    "ownerName": "Michael Iversen",
+    "intro1": "Jeg hedder Michael Iversen. Jeg er uddannet bygningsmaler siden 2009 og har arbejdet med spartling, maling og overfladebehandling i mere end 15 år.",
+    "intro2": "I 2020 startede jeg Højfynsspartel i Vissenbjerg. Jeg valgte at starte for mig selv, fordi jeg ville have frihed til at gøre tingene ordentligt – uden at skulle skynde mig eller gå på kompromis med kvaliteten.",
+    "intro3": "Jeg arbejder tæt sammen med Mikkel, som er særligt dygtig til malerarbejde og beskæring i frihånd. Sammen dækker vi hele processen – fra den grundige forberedelse til den fine finish og de dekorative detaljer.",
+    "philosophyTitle": "Kvalitet er ikke noget, man siger. Det er noget, man gør.",
+    "philosophyText": "Det betyder, at vi bruger den tid, der skal til. At vi forbereder ordentligt. At vi er ærlige om, hvad en opgave kræver. Og at vi ikke forlader et projekt, før det er færdigt på den måde, vi selv ville acceptere det.",
+    "factExperience": "15+ år som bygningsmaler",
+    "factFounded": "2020 i Vissenbjerg",
+    "aboutImage": "/images/projects/commercial/commercial-hall-plastering-01.jpg",
+    "ctaText": "Kontakt os om din opgave →"
+  },
+  "colors": {
+    "background": "#0A0A0A",
+    "surface": "#121212",
+    "surface2": "#1C1C1C",
+    "border": "#252525",
+    "textPrimary": "#F5F5F5",
+    "textMuted": "#A1A1AA",
+    "accent": "#C5A36E",
+    "accentHover": "#D4B47F"
+  }
+}

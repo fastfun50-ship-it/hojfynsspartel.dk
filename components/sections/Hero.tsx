@@ -1,6 +1,15 @@
-'use client'
+import type { SiteContent } from '@/types/cms'
 
-export function Hero() {
+interface HeroProps {
+  content: SiteContent
+}
+
+export function Hero({ content }: HeroProps) {
+  const { hero, company, contact } = content
+
+  // Split subheadline by \n for nice breaks
+  const subLines = hero.subheadline.split('\n')
+
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
       
@@ -28,21 +37,22 @@ export function Hero() {
           
           {/* Small accent line + label */}
           <div className="flex items-center gap-3 mb-8">
-            <div className="h-px w-8 bg-[#C5A36E]"></div>
-            <span className="text-xs tracking-[4px] text-white/70 font-medium">VISSENBJERG • FYN</span>
+            <div className="h-px w-8 bg-[var(--gold)]"></div>
+            <span className="text-xs tracking-[4px] text-white/70 font-medium">{hero.locationLabel}</span>
           </div>
 
-          {/* Main headline */}
-          <h1 className="text-[88px] md:text-[110px] leading-[0.86] tracking-[-6.5px] font-semibold text-white mb-6">
-            Vi laver ikke<br />
-            vægge.<br />
-            <span className="text-[#C5A36E]">Vi laver ro.</span>
+          {/* Main headline - support the special "ro" accent */}
+          <h1 className="text-[88px] md:text-[110px] leading-[0.86] tracking-[-6.5px] font-semibold text-[var(--text-primary)] mb-6">
+            {hero.headline1}<br />
+            {hero.headline2}<br />
+            <span className="text-[var(--gold)]">{hero.headlineAccent}</span>
           </h1>
 
           <div className="max-w-md">
             <p className="text-2xl text-white/85 leading-tight tracking-[-0.3px]">
-              15 års erfaring. Intet kompromis.<br />
-              Kun det arbejde vi selv ville være stolte af.
+              {subLines.map((line, i) => (
+                <span key={i}>{line}{i < subLines.length - 1 && <br />}</span>
+              ))}
             </p>
           </div>
 
@@ -52,14 +62,14 @@ export function Hero() {
               href="#kontakt" 
               className="btn btn-primary px-9 py-4 text-base"
             >
-              Få et tilbud
+              {hero.ctaPrimary}
             </a>
             
             <a 
               href="#arbejde" 
-              className="group flex items-center gap-2 pl-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+              className="group flex items-center gap-2 pl-2 text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
-              Se udvalgte arbejder 
+              {hero.ctaSecondary} 
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
           </div>
@@ -67,9 +77,9 @@ export function Hero() {
 
         {/* Bottom meta info */}
         <div className="relative z-10 mt-24 md:mt-32 flex flex-col md:flex-row md:items-center gap-y-3 gap-x-12 text-sm border-t border-white/20 pt-8 text-white/60">
-          <div>Michael Iversen</div>
-          <div>Bygningsmaler siden 2009</div>
-          <div>Hel Fyn + Sjælland &amp; Jylland</div>
+          <div>{company.owner}</div>
+          <div>Bygningsmaler siden {company.founded}</div>
+          <div>{contact.area}</div>
         </div>
       </div>
 
@@ -80,3 +90,4 @@ export function Hero() {
     </section>
   )
 }
+
