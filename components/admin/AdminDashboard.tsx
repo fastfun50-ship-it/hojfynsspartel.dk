@@ -506,12 +506,30 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
                       Outline
                     </button>
                   </div>
+
+                  {/* Mini process example to judge more of the theme */}
+                  <div className="mt-4 pt-4 border-t border-[var(--border)] flex gap-3 text-sm">
+                    <div style={{ color: 'var(--gold)' }} className="font-mono text-base">01</div>
+                    <div>
+                      <div className="font-medium">Proces eksempel</div>
+                      <div style={{ color: 'var(--text-muted)' }} className="text-xs">Kort beskrivelse af trinnet her.</div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <p className="text-[10px] mt-1.5" style={{ color: 'var(--text-muted)' }}>Forhåndsvisningen viser hvordan baggrund, surfaces, tekst og accent kommer til at se ud på den rigtige side. Selve editor-panelet herover skifter også farve efter dit valg.</p>
             </div>
 
-            <button onClick={() => saveContent({ colors: content.colors })} disabled={isPending} className="mt-6 btn btn-primary px-6">Gem farver</button>
+            <div className="flex items-center gap-4 mt-6">
+              <button onClick={() => saveContent({ colors: content.colors })} disabled={isPending} className="btn btn-primary px-6">Gem farver</button>
+              <a 
+                href="/" 
+                target="_blank" 
+                className="text-sm text-[var(--gold)] hover:underline flex items-center gap-1"
+              >
+                Se live side <span aria-hidden>→</span>
+              </a>
+            </div>
             <p className="text-[10px] text-white/40 mt-2">Gemmer til den offentlige side. Admin-dashboard forbliver altid i det klassiske mørke tema for at være læsbart.</p>
           </section>
         </div>
