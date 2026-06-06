@@ -58,6 +58,8 @@ export default function AdminLogin() {
             <label className="block text-xs tracking-[2px] text-white/50 mb-2">ADGANGSKODE</label>
             <input
               type="password"
+              name="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-[#111] border border-white/20 rounded-2xl px-5 py-3.5 text-white placeholder:text-white/40 focus:border-[#C5A36E] focus:outline-none text-lg"
