@@ -156,6 +156,8 @@ export const getSiteContent = cache(async (): Promise<SiteContent> => {
       subheadline: '15 års erfaring. Intet kompromis.\nKun det arbejde vi selv ville være stolte af.',
       ctaPrimary: 'Få et tilbud',
       ctaSecondary: 'Se udvalgte arbejder',
+      heroVideo: '/hero-video.mp4',
+      heroPoster: '/hero-poster.jpg',
     },
     about: {
       ownerName: 'Michael Iversen',

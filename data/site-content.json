@@ -35,7 +35,9 @@
     "headlineAccent": "Vi laver ro.",
     "subheadline": "15 års erfaring. Intet kompromis.\nKun det arbejde vi selv ville være stolte af.",
     "ctaPrimary": "Få et tilbud",
-    "ctaSecondary": "Se udvalgte arbejder"
+    "ctaSecondary": "Se udvalgte arbejder",
+    "heroVideo": "/hero-video.mp4",
+    "heroPoster": "/hero-poster.jpg"
   },
   "about": {
     "ownerName": "Michael Iversen",
@@ -50,13 +52,13 @@
     "ctaText": "Kontakt os om din opgave →"
   },
   "colors": {
-    "background": "#0A0A0A",
-    "surface": "#121212",
-    "surface2": "#1C1C1C",
-    "border": "#252525",
+    "background": "#070707",
+    "surface": "#0E0E0E",
+    "surface2": "#151515",
+    "border": "#1F1F1F",
     "textPrimary": "#F5F5F5",
     "textMuted": "#A1A1AA",
-    "accent": "#C5A36E",
-    "accentHover": "#D4B47F"
+    "accent": "#7dd4a3",
+    "accentHover": "#96edbc"
   }
 }

@@ -40,6 +40,9 @@ export interface HeroContent {
   subheadline: string
   ctaPrimary: string
   ctaSecondary: string
+  // Background media - can be switched via CMS
+  heroVideo?: string
+  heroPoster?: string
 }
 
 export interface AboutContent {

@@ -14,7 +14,7 @@
       "/images/projects/commercial/commercial-hall-plastering-03.jpg"
     ],
     "order": 1,
-    "featuredOnHome": true
+    "featuredOnHome": false
   },
   {
     "id": 2,
@@ -45,5 +45,31 @@
     "id": 3,
     "order": 3,
     "featuredOnHome": false
+  },
+  {
+    "title": "Nyt projekt",
+    "location": "Fyn",
+    "category": "Renovering",
+    "challenge": "Beskriv udfordringen her...",
+    "approach": "Sådan greb vi det an...",
+    "result": "Resultatet blev...",
+    "beforeImages": [],
+    "afterImages": [],
+    "featuredOnHome": false,
+    "id": 4,
+    "order": 4
+  },
+  {
+    "title": "Nyt projekt",
+    "location": "Fyn",
+    "category": "Renovering",
+    "challenge": "Beskriv udfordringen her...",
+    "approach": "Sådan greb vi det an...",
+    "result": "Resultatet blev...",
+    "beforeImages": [],
+    "afterImages": [],
+    "featuredOnHome": false,
+    "id": 5,
+    "order": 5
   }
 ]

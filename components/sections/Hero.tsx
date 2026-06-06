@@ -13,16 +13,16 @@ export function Hero({ content }: HeroProps) {
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
       
-      {/* Video Background */}
+      {/* Video Background - can be switched in CMS under Generelt indhold > Hero */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
         muted
         loop
         playsInline
-        poster="/hero-poster.jpg"
+        poster={hero.heroPoster || '/hero-poster.jpg'}
       >
-        <source src="/hero-video.mp4" type="video/mp4" />
+        <source src={hero.heroVideo || '/hero-video.mp4'} type="video/mp4" />
         {/* Fallback for browsers that don't support video */}
         Your browser does not support the video tag.
       </video>
