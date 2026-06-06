@@ -63,14 +63,16 @@ async function saveJson<T>(key: string, data: T): Promise<void> {
     try {
       const { put: blobPut } = await import('@vercel/blob')
       const putOptions: any = {
-        access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false, // stable path
+        allowOverwrite: true,   // CMS intentionally overwrites stable keys like site-content.json
       }
       if (BLOB_STORE_ID) {
         putOptions.storeId = BLOB_STORE_ID
       } else if (BLOB_TOKEN) {
         putOptions.token = BLOB_TOKEN
+      } else {
+        putOptions.access = 'public'
       }
       await blobPut(key, json, putOptions)
       return
