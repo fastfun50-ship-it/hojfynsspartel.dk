@@ -96,7 +96,7 @@ Det nuværende CMS bruger en **meget simpel password-baseret login** (intet brug
 - Rate limiting på login-API (max 6 forsøg pr. IP pr. 5 minutter)
 - Generiske fejlmeddelelser (afslører ikke om password var forkert)
 - httpOnly + secure cookies
-- JWT signing med separat secret (hvis sat)
+- JWT signing med separat secret (hvis sat). Login virker stadig, selv hvis ADMIN_JWT_SECRET mangler (falder tilbage til passwordet), men giver sikkerhedsadvarsler i logs.
 
 **Anbefalinger til Michael:**
 1. Brug et **meget stærkt, tilfældigt password** (20+ tegn). Generer det f.eks. med 1Password eller Bitwarden.

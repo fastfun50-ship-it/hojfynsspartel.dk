@@ -283,7 +283,87 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
           {/* Hero */}
           <section>
             <h2 className="text-xl font-semibold mb-4 tracking-tight">Hero sektion</h2>
-            <p className="text-xs text-white/50 mb-3">De tre første headline-felter styrer den store kunstneriske overskrift (sidste linje vises i guld). Du kan nu også ændre knapperne nedenfor.</p>
+            <p className="text-xs text-white/50 mb-3">Her kan du skifte hele hero-indholdet: overskrifter, knapper OG baggrundsvideo/poster.</p>
+
+            {/* Hero media - switch out video/poster (moved up for visibility) */}
+            <div className="mb-4 p-4 rounded-2xl border border-white/10 bg-white/5">
+              <div className="text-sm font-medium mb-2">Baggrund (video + poster)</div>
+              <p className="text-xs text-white/50 mb-3">Skift videoen eller posteren der vises bag hero-teksten. Upload direkte her eller indsæt sti.</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Video */}
+                <div>
+                  <label className="text-xs tracking-widest text-white/50 mb-1.5 block">HERO VIDEO (mp4)</label>
+                  <div className="flex gap-2">
+                    <input 
+                      value={content.hero.heroVideo || ''} 
+                      onChange={(e) => setContent(c => ({...c, hero: {...c.hero, heroVideo: e.target.value }}))} 
+                      placeholder="/hero-video.mp4"
+                      className="flex-1 bg-[var(--surface)] border border-white/20 rounded-2xl px-4 py-2 text-sm" 
+                    />
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-3 rounded-full bg-white/10 hover:bg-white/20 text-sm whitespace-nowrap">
+                      <Upload className="w-4 h-4" /> Upload
+                      <input
+                        type="file"
+                        accept="video/mp4,video/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const fd = new FormData()
+                          fd.append('file', file)
+                          try {
+                            const { url } = await uploadImage(fd)
+                            setContent(c => ({...c, hero: {...c.hero, heroVideo: url }}))
+                            toast.success('Video uploadet')
+                          } catch (err: any) {
+                            toast.error('Upload fejlede: ' + (err.message || ''))
+                          }
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Poster */}
+                <div>
+                  <label className="text-xs tracking-widest text-white/50 mb-1.5 block">HERO POSTER (billede)</label>
+                  <div className="flex gap-2">
+                    <input 
+                      value={content.hero.heroPoster || ''} 
+                      onChange={(e) => setContent(c => ({...c, hero: {...c.hero, heroPoster: e.target.value }}))} 
+                      placeholder="/hero-poster.jpg"
+                      className="flex-1 bg-[var(--surface)] border border-white/20 rounded-2xl px-4 py-2 text-sm" 
+                    />
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-3 rounded-full bg-white/10 hover:bg-white/20 text-sm whitespace-nowrap">
+                      <Upload className="w-4 h-4" /> Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const fd = new FormData()
+                          fd.append('file', file)
+                          try {
+                            const { url } = await uploadImage(fd)
+                            setContent(c => ({...c, hero: {...c.hero, heroPoster: url }}))
+                            toast.success('Poster uploadet')
+                          } catch (err: any) {
+                            toast.error('Upload fejlede: ' + (err.message || ''))
+                          }
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[10px] text-white/40 mt-2">Videoen afspilles automatisk, muted, loop. Posteren vises mens video loader.</p>
+            </div>
+
             <div className="space-y-3">
               <Input label="Lokation label" value={content.hero.locationLabel} onChange={(v) => setContent(c => ({...c, hero: {...c.hero, locationLabel: v}}))} />
               <Input label="Headline del 1" value={content.hero.headline1} onChange={(v) => setContent(c => ({...c, hero: {...c.hero, headline1: v}}))} />
@@ -296,6 +376,7 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
               <Input label="CTA primær knap (stor guld-knap)" value={content.hero.ctaPrimary} onChange={(v) => setContent(c => ({...c, hero: {...c.hero, ctaPrimary: v}}))} />
               <Input label="CTA sekundær knap (tekst-link)" value={content.hero.ctaSecondary} onChange={(v) => setContent(c => ({...c, hero: {...c.hero, ctaSecondary: v}}))} />
             </div>
+
             <button onClick={() => saveContent({ hero: content.hero })} disabled={isPending} className="mt-4 btn btn-primary px-6">Gem hero</button>
           </section>
 
@@ -365,20 +446,57 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
                     colors: { ...DEFAULT_COLORS } 
                   },
                   { 
-                    name: 'Varm Bronze', 
-                    colors: { background: '#0F0C0A', surface: '#1A1612', surface2: '#221D18', border: '#2E2822', textPrimary: '#F5F0E9', textMuted: '#A89B8C', accent: '#8B5E3C', accentHover: '#A67C52' } 
+                    name: 'Varm Guld', 
+                    colors: { 
+                      ...DEFAULT_COLORS, 
+                      background: '#0F0C0A', 
+                      surface: '#1A1612', 
+                      surface2: '#221D18', 
+                      border: '#2E2822', 
+                      textPrimary: '#F5F0E9', 
+                      textMuted: '#A89B8C', 
+                      accent: '#D4A574', 
+                      accentHover: '#E2B98A' 
+                    } 
                   },
                   { 
-                    name: 'Kølig Kul (mørkere)', 
-                    colors: { background: '#050505', surface: '#0F0F0F', surface2: '#161616', border: '#1F1F1F', textPrimary: '#F5F5F5', textMuted: '#A1A1AA', accent: '#9CA3AF', accentHover: '#D1D5DB' } 
+                    name: 'Kølig Guld', 
+                    colors: { 
+                      ...DEFAULT_COLORS, 
+                      background: '#050505', 
+                      surface: '#0F0F0F', 
+                      surface2: '#161616', 
+                      border: '#1F1F1F', 
+                      textPrimary: '#F5F5F5', 
+                      textMuted: '#A1A1AA', 
+                      accent: '#C5A36E', 
+                      accentHover: '#D4B47F' 
+                    } 
                   },
                   { 
-                    name: 'Dyb Blå Nat', 
-                    colors: { background: '#0A0C10', surface: '#111418', surface2: '#161B21', border: '#1E252E', textPrimary: '#F0F4F8', textMuted: '#9CA3AF', accent: '#3B82F6', accentHover: '#60A5FA' } 
+                    name: 'Lysegrøn', 
+                    colors: { 
+                      ...DEFAULT_COLORS, 
+                      background: '#070707', 
+                      surface: '#0E0E0E', 
+                      surface2: '#151515', 
+                      border: '#1F1F1F', 
+                      accent: '#7dd4a3', 
+                      accentHover: '#96edbc' 
+                    } 
                   },
                   { 
-                    name: 'Skov Grøn Mørk', 
-                    colors: { background: '#0A0D0A', surface: '#111611', surface2: '#171C17', border: '#1F261F', textPrimary: '#F0F5F0', textMuted: '#A1A8A1', accent: '#10B981', accentHover: '#34D399' } 
+                    name: 'Rig Blå', 
+                    colors: { 
+                      ...DEFAULT_COLORS, 
+                      background: '#0C0A08', 
+                      surface: '#14120F', 
+                      surface2: '#1C1915', 
+                      border: '#28241F', 
+                      textMuted: '#9A9285', 
+                      accent: '#6FA8D9', 
+                      accentHover: '#8ABBE5' 
+                    } 
                   },
                 ].map((preset) => (
                   <button
