@@ -5,6 +5,10 @@ import { verifyAuth, logout } from '@/lib/auth'
 import { Toaster } from 'sonner'
 import { DEFAULT_COLORS } from '@/types/cms'
 
+// Force dynamic rendering for admin routes to prevent static generation
+// errors from CMS blob no-store fetches (e.g. during build for /admin/login, not-found).
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({
   children,
 }: {

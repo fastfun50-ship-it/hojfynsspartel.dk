@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
+// Force dynamic rendering to avoid static generation errors from CMS blob fetches
+// (no-store fetches during build for login/not-found routes)
+export const dynamic = 'force-dynamic'
+
 export default function AdminLogin() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
