@@ -9,7 +9,11 @@ const DATA_DIR = path.join(process.cwd(), 'data')
 // In development we ALWAYS use fast local data/ JSON files (no network, no heavy deps).
 // In production we use Vercel Blob (if token present) for persistence across deploys.
 const isDev = process.env.NODE_ENV === 'development'
-const USE_BLOB = !isDev && !!process.env.BLOB_READ_WRITE_TOKEN
+
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || process.env.CMS_BLOB_READ_WRITE_TOKEN
+const BLOB_STORE_ID = process.env.BLOB_STORE_ID || process.env.CMS_BLOB_STORE_ID
+
+const USE_BLOB = !isDev && !!BLOB_TOKEN
 
 // Ensure local data dir (dev)
 async function ensureDataDir() {
@@ -24,7 +28,10 @@ async function loadJson<T>(key: string, fallback: T): Promise<T> {
     try {
       // Dynamic import so the heavy @vercel/blob package is NEVER loaded in dev
       const { list: blobList } = await import('@vercel/blob')
-      const { blobs } = await blobList({ prefix: key, limit: 1 })
+      const listOptions: any = { prefix: key, limit: 1 }
+      if (BLOB_TOKEN) listOptions.token = BLOB_TOKEN
+      if (BLOB_STORE_ID) listOptions.storeId = BLOB_STORE_ID
+      const { blobs } = await blobList(listOptions)
       if (blobs.length > 0) {
         const res = await fetch(blobs[0].url, { cache: 'no-store' })
         if (res.ok) {
@@ -52,11 +59,14 @@ async function saveJson<T>(key: string, data: T): Promise<void> {
   if (USE_BLOB) {
     try {
       const { put: blobPut } = await import('@vercel/blob')
-      await blobPut(key, json, {
+      const putOptions: any = {
         access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false, // stable path
-      })
+      }
+      if (BLOB_TOKEN) putOptions.token = BLOB_TOKEN
+      if (BLOB_STORE_ID) putOptions.storeId = BLOB_STORE_ID
+      await blobPut(key, json, putOptions)
       return
     } catch (e) {
       console.error('[cms] blob save failed for', key, e)
