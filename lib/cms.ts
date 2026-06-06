@@ -29,8 +29,11 @@ async function loadJson<T>(key: string, fallback: T): Promise<T> {
       // Dynamic import so the heavy @vercel/blob package is NEVER loaded in dev
       const { list: blobList } = await import('@vercel/blob')
       const listOptions: any = { prefix: key, limit: 1 }
-      if (BLOB_TOKEN) listOptions.token = BLOB_TOKEN
-      if (BLOB_STORE_ID) listOptions.storeId = BLOB_STORE_ID
+      if (BLOB_STORE_ID) {
+        listOptions.storeId = BLOB_STORE_ID
+      } else if (BLOB_TOKEN) {
+        listOptions.token = BLOB_TOKEN
+      }
       const { blobs } = await blobList(listOptions)
       if (blobs.length > 0) {
         const res = await fetch(blobs[0].url, { cache: 'no-store' })
@@ -64,8 +67,11 @@ async function saveJson<T>(key: string, data: T): Promise<void> {
         contentType: 'application/json',
         addRandomSuffix: false, // stable path
       }
-      if (BLOB_TOKEN) putOptions.token = BLOB_TOKEN
-      if (BLOB_STORE_ID) putOptions.storeId = BLOB_STORE_ID
+      if (BLOB_STORE_ID) {
+        putOptions.storeId = BLOB_STORE_ID
+      } else if (BLOB_TOKEN) {
+        putOptions.token = BLOB_TOKEN
+      }
       await blobPut(key, json, putOptions)
       return
     } catch (e) {
