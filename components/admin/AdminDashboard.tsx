@@ -8,6 +8,7 @@ import {
   updateProject,
   deleteProject,
   reorderProjects,
+  saveFeaturedOnHome,
   updateProcessSteps,
   markAsRead,
   removeInquiry,
@@ -34,6 +35,8 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
   const [isPending, startTransition] = useTransition()
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [uploading, setUploading] = useState(false)
+  // Local draft for "Vis på forsiden" — only written to server when user clicks Gem
+  const [featuredDirty, setFeaturedDirty] = useState(false)
 
   // ===== SITE CONTENT SAVE =====
   async function saveContent(partial: Partial<SiteContent>) {
@@ -89,8 +92,9 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
           featuredOnHome: proj.featuredOnHome || false,
         })
         setProjects((prev) => prev.map((p) => (p.id === proj.id ? proj : p)))
+        setFeaturedDirty(false)
         setEditingProject(null)
-        toast.success('Projekt gemt')
+        toast.success('Projekt gemt — live på hjemmesiden')
       } catch (e) {
         toast.error(e instanceof Error ? e.message : 'Kunne ikke gemme projekt')
       }
@@ -100,10 +104,50 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
   async function handleDeleteProject(id: number) {
     if (!confirm('Slet dette projekt permanent?')) return
     startTransition(async () => {
-      await deleteProject(id)
-      setProjects((p) => p.filter((x) => x.id !== id))
-      if (editingProject?.id === id) setEditingProject(null)
-      toast.success('Projekt slettet')
+      try {
+        await deleteProject(id)
+        setProjects((p) => p.filter((x) => x.id !== id))
+        if (editingProject?.id === id) setEditingProject(null)
+        setFeaturedDirty(false)
+        toast.success('Projekt slettet')
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Kunne ikke slette projekt')
+      }
+    })
+  }
+
+  function toggleFeaturedLocal(projectId: number, val: boolean) {
+    if (val) {
+      const count = projects.filter((pp) => pp.featuredOnHome && pp.id !== projectId).length
+      if (count >= 2) {
+        toast.error('Max 2 projekter kan være valgt til forsiden.')
+        return
+      }
+    }
+    setProjects((prev) =>
+      prev.map((pp) => (pp.id === projectId ? { ...pp, featuredOnHome: val } : pp))
+    )
+    setFeaturedDirty(true)
+  }
+
+  async function handleSaveFeatured() {
+    const featuredIds = projects.filter((p) => p.featuredOnHome).map((p) => p.id)
+    startTransition(async () => {
+      try {
+        const res = await saveFeaturedOnHome(featuredIds)
+        if (res.success) {
+          setFeaturedDirty(false)
+          toast.success(
+            featuredIds.length === 0
+              ? 'Forside opdateret — ingen projekter valgt'
+              : `Forside opdateret — ${featuredIds.length} projekt${featuredIds.length === 1 ? '' : 'er'} live`
+          )
+        } else {
+          toast.error(res.error || 'Kunne ikke gemme forside-valg')
+        }
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Kunne ikke gemme forside-valg')
+      }
     })
   }
 
@@ -665,13 +709,46 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
       {/* PROJECTS */}
       {activeTab === 'projects' && (
         <div>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Udvalgte arbejder / projekter</h2>
               <p className="text-sm text-white/60">Hvert projekt viser Udfordring → Greb an → Resultat + billeder</p>
             </div>
             <button onClick={handleCreateProject} className="btn btn-primary flex items-center gap-2 px-5">
               <Plus className="w-4 h-4" /> Nyt projekt
+            </button>
+          </div>
+
+          {/* Sticky save bar for homepage featured selection */}
+          <div
+            className={`mb-6 rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              featuredDirty
+                ? 'border-[#C5A36E]/60 bg-[#C5A36E]/10'
+                : 'border-white/10 bg-white/[0.03]'
+            }`}
+          >
+            <div>
+              <div className="text-sm font-medium">
+                Vis på forsiden{' '}
+                <span className="text-white/50 font-normal">
+                  ({projects.filter((p) => p.featuredOnHome).length}/2 valgt)
+                </span>
+              </div>
+              <p className="text-xs text-white/50 mt-0.5">
+                Sæt flueben ved op til 2 projekter, og tryk <strong className="text-white/80">Gem forside-valg</strong>.
+                {featuredDirty && (
+                  <span className="text-[#C5A36E]"> — Du har ugemte ændringer</span>
+                )}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveFeatured}
+              disabled={isPending || !featuredDirty}
+              className="btn btn-primary px-6 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              <Save className="w-4 h-4" />
+              {isPending ? 'Gemmer…' : 'Gem forside-valg'}
             </button>
           </div>
 
@@ -693,25 +770,13 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
                   </div>
                 </div>
 
-                <div className="mt-2">
-                  <label className="flex items-center gap-2 text-xs cursor-pointer">
+                <div className="mt-3">
+                  <label className="inline-flex items-center gap-2.5 text-sm cursor-pointer select-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 hover:border-white/20">
                     <input
                       type="checkbox"
-                      checked={p.featuredOnHome || false}
-                      onChange={async (e) => {
-                        const val = e.target.checked;
-                        if (val) {
-                          const count = projects.filter(pp => pp.featuredOnHome && pp.id !== p.id).length;
-                          if (count >= 2) {
-                            toast.error("Max 2 projekter kan være valgt til forsiden.");
-                            return;
-                          }
-                        }
-                        const updated = { ...p, featuredOnHome: val };
-                        await updateProject(p.id, { featuredOnHome: val });
-                        setProjects(prev => prev.map(pp => pp.id === p.id ? updated : pp));
-                        toast.success(val ? "Tilføjet til forside" : "Fjernet fra forside");
-                      }}
+                      className="w-4 h-4 accent-[#C5A36E]"
+                      checked={!!p.featuredOnHome}
+                      onChange={(e) => toggleFeaturedLocal(p.id, e.target.checked)}
                     />
                     <span>Vis på forsiden</span>
                   </label>
@@ -760,27 +825,32 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
                   <Textarea label="SÅDAN GREB VI DET AN" value={editingProject.approach} onChange={(v) => setEditingProject({...editingProject, approach: v})} rows={4} />
                   <Textarea label="RESULTATET" value={editingProject.result} onChange={(v) => setEditingProject({...editingProject, result: v})} rows={4} />
 
-                  {/* Vælg om på forsiden */}
+                  {/* Vælg om på forsiden — gemmes sammen med "Gem projekt" */}
                   <div className="pt-2 border-t border-white/10">
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="inline-flex items-center gap-2.5 text-sm cursor-pointer select-none rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
                       <input
                         type="checkbox"
-                        checked={editingProject.featuredOnHome || false}
+                        className="w-4 h-4 accent-[#C5A36E]"
+                        checked={!!editingProject.featuredOnHome}
                         onChange={(e) => {
-                          const val = e.target.checked;
+                          const val = e.target.checked
                           if (val) {
-                            const count = projects.filter(pp => pp.featuredOnHome && pp.id !== editingProject.id).length;
+                            const count = projects.filter(
+                              (pp) => pp.featuredOnHome && pp.id !== editingProject.id
+                            ).length
                             if (count >= 2) {
-                              toast.error("Max 2 projekter kan være valgt til forsiden.");
-                              return;
+                              toast.error('Max 2 projekter kan være valgt til forsiden.')
+                              return
                             }
                           }
-                          setEditingProject({...editingProject, featuredOnHome: val});
+                          setEditingProject({ ...editingProject, featuredOnHome: val })
                         }}
                       />
                       <span>Vis på forsiden (max 2)</span>
                     </label>
-                    <p className="text-[10px] text-white/40 mt-1">Kun valgte projekter vises i "Udvalgt arbejde" på forsiden.</p>
+                    <p className="text-[10px] text-white/40 mt-1">
+                      Gemmes når du trykker <strong className="text-white/70">Gem projekt</strong> nedenfor.
+                    </p>
                   </div>
 
                   {/* Før og Efter billeder - eksplicit understøttelse af før/efter uploads */}

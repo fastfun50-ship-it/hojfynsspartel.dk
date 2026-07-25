@@ -110,6 +110,30 @@ export async function reorderProjects(orderedIds: number[]) {
   revalidateSite()
 }
 
+/** Batch-save which projects appear on the homepage (max 2). */
+export async function saveFeaturedOnHome(featuredIds: number[]) {
+  await ensureAdmin()
+  const unique = [...new Set(featuredIds)]
+  if (unique.length > 2) {
+    return { success: false as const, error: 'Max 2 projekter kan vises på forsiden.' }
+  }
+  try {
+    const projects = await getProjects()
+    const featuredSet = new Set(unique)
+    const updated = projects.map((p) => ({
+      ...p,
+      featuredOnHome: featuredSet.has(p.id),
+    }))
+    await saveProjects(updated)
+    revalidateSite()
+    return { success: true as const }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Ukendt fejl ved gem'
+    console.error('[cms-actions] saveFeaturedOnHome failed:', e)
+    return { success: false as const, error: message }
+  }
+}
+
 // ===== PROCESS =====
 export async function updateProcessSteps(steps: ProcessStep[]) {
   await ensureAdmin()
