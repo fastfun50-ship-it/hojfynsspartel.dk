@@ -28,25 +28,37 @@ async function ensureAdmin() {
 // ===== SITE CONTENT =====
 export async function updateSiteContent(data: Partial<SiteContent>) {
   await ensureAdmin()
-  const current = await getSiteContent()
-  const merged: SiteContent = {
-    ...current,
-    ...data,
-    company: { ...current.company, ...data.company },
-    contact: { ...current.contact, ...data.contact },
-    metadata: { ...current.metadata, ...data.metadata },
-    hero: { ...current.hero, ...data.hero },
-    about: { ...current.about, ...data.about },
-    colors: { 
-      ...current.colors, 
-      ...data.colors,
-      // ensure nested if partial
-    },
+  try {
+    const current = await getSiteContent()
+    const merged: SiteContent = {
+      ...current,
+      ...data,
+      company: { ...current.company, ...data.company },
+      contact: { ...current.contact, ...data.contact },
+      metadata: { ...current.metadata, ...data.metadata },
+      hero: { ...current.hero, ...data.hero },
+      about: { ...current.about, ...data.about },
+      colors: {
+        ...current.colors,
+        ...data.colors,
+      },
+    }
+    await saveSiteContent(merged)
+    revalidatePath('/')
+    revalidatePath('/admin')
+    revalidatePath('/projekter')
+    return { success: true as const }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Ukendt fejl ved gem'
+    console.error('[cms-actions] updateSiteContent failed:', e)
+    return { success: false as const, error: message }
   }
-  await saveSiteContent(merged)
+}
+
+function revalidateSite() {
   revalidatePath('/')
   revalidatePath('/admin')
-  return { success: true }
+  revalidatePath('/projekter')
 }
 
 // ===== PROJECTS =====
@@ -60,8 +72,7 @@ export async function createProject(project: Omit<Project, 'id' | 'order'>) {
     order: projects.length + 1,
   }
   await saveProjects([...projects, newProject])
-  revalidatePath('/')
-  revalidatePath('/admin')
+  revalidateSite()
   return newProject
 }
 
@@ -70,9 +81,8 @@ export async function updateProject(id: number, updates: Partial<Omit<Project, '
   const projects = await getProjects()
   const updated = projects.map((p) => (p.id === id ? { ...p, ...updates } : p))
   await saveProjects(updated)
-  revalidatePath('/')
-  revalidatePath('/admin')
-  return { success: true }
+  revalidateSite()
+  return { success: true as const }
 }
 
 export async function deleteProject(id: number) {
@@ -82,9 +92,8 @@ export async function deleteProject(id: number) {
   // reindex order
   const reindexed = filtered.map((p, i) => ({ ...p, order: i + 1 }))
   await saveProjects(reindexed)
-  revalidatePath('/')
-  revalidatePath('/admin')
-  return { success: true }
+  revalidateSite()
+  return { success: true as const }
 }
 
 export async function reorderProjects(orderedIds: number[]) {
@@ -98,17 +107,15 @@ export async function reorderProjects(orderedIds: number[]) {
     })
     .filter(Boolean) as Project[]
   await saveProjects(reordered)
-  revalidatePath('/')
-  revalidatePath('/admin')
+  revalidateSite()
 }
 
 // ===== PROCESS =====
 export async function updateProcessSteps(steps: ProcessStep[]) {
   await ensureAdmin()
   await saveProcessSteps(steps)
-  revalidatePath('/')
-  revalidatePath('/admin')
-  return { success: true }
+  revalidateSite()
+  return { success: true as const }
 }
 
 // ===== INQUIRIES =====
@@ -132,19 +139,37 @@ export async function uploadImage(formData: FormData) {
   if (!file) throw new Error('No file')
 
   const filename = file.name.replace(/\s+/g, '-').toLowerCase()
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN || process.env.CMS_BLOB_READ_WRITE_TOKEN
+  const blobStoreId = process.env.BLOB_STORE_ID || process.env.CMS_BLOB_STORE_ID
+  const useBlob =
+    process.env.NODE_ENV !== 'development' && !!(blobToken || blobStoreId || process.env.VERCEL)
 
-  // If Vercel Blob token present → use it (prod + previews)
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const { put: blobPut } = await import('@vercel/blob')
-    const blob = await blobPut(`uploads/${Date.now()}-${filename}`, file, {
-      access: 'public',
-      addRandomSuffix: false,
-    })
-    return { url: blob.url }
+  if (useBlob) {
+    try {
+      const { put: blobPut } = await import('@vercel/blob')
+      const putOptions: {
+        access: 'public'
+        addRandomSuffix: boolean
+        token?: string
+        storeId?: string
+      } = {
+        access: 'public',
+        addRandomSuffix: false,
+      }
+      if (blobToken) putOptions.token = blobToken
+      if (blobStoreId) putOptions.storeId = blobStoreId
+
+      const blob = await blobPut(`uploads/${Date.now()}-${filename}`, file, putOptions)
+      return { url: blob.url }
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e)
+      throw new Error(
+        `Billedupload til Blob fejlede: ${message}. Tjek BLOB_READ_WRITE_TOKEN i Vercel.`
+      )
+    }
   }
 
-  // Dev fallback: write to public/uploads (will be served statically)
-  // Note: in real prod without blob this won't persist, but for local testing fine.
+  // Dev fallback: write to public/uploads (served statically)
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
   const { writeFile, mkdir } = await import('fs/promises')

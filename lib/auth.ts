@@ -75,6 +75,9 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const COOKIE_NAME = 'admin_token'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
+// Must be '/' so the cookie is sent on /admin pages, server actions, AND /api/admin/* routes.
+// Path '/admin' broke logout and could break auth checks on non-/admin request paths.
+const COOKIE_PATH = '/'
 
 export async function login(password: string): Promise<{ success: boolean; error?: string }> {
   if (!password || password !== ADMIN_PASSWORD) {
@@ -88,11 +91,20 @@ export async function login(password: string): Promise<{ success: boolean; error
     .sign(JWT_SECRET)
 
   const cookieStore = await cookies()
+  const secure = process.env.NODE_ENV === 'production'
+  // Clear any legacy cookie that was set with path=/admin (older CMS builds)
+  cookieStore.set(COOKIE_NAME, '', {
+    httpOnly: true,
+    secure,
+    sameSite: 'lax',
+    path: '/admin',
+    maxAge: 0,
+  })
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure,
     sameSite: 'lax',
-    path: '/admin', // Only sent to admin routes
+    path: COOKIE_PATH,
     maxAge: COOKIE_MAX_AGE,
   })
 
@@ -101,7 +113,17 @@ export async function login(password: string): Promise<{ success: boolean; error
 
 export async function logout() {
   const cookieStore = await cookies()
-  cookieStore.delete(COOKIE_NAME)
+  const secure = process.env.NODE_ENV === 'production'
+  // Clear both current and legacy cookie paths
+  for (const path of [COOKIE_PATH, '/admin'] as const) {
+    cookieStore.set(COOKIE_NAME, '', {
+      httpOnly: true,
+      secure,
+      sameSite: 'lax',
+      path,
+      maxAge: 0,
+    })
+  }
 }
 
 export async function verifyAuth(): Promise<boolean> {

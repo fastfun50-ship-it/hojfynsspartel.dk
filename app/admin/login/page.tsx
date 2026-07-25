@@ -4,9 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-// Force dynamic rendering to avoid static generation errors from CMS blob fetches
-// (no-store fetches during build for login/not-found routes)
-export const dynamic = 'force-dynamic'
+// Note: route segment config (dynamic = force-dynamic) lives in app/admin/layout.tsx —
+// client components cannot export segment config.
 
 export default function AdminLogin() {
   const [password, setPassword] = useState('')

@@ -38,12 +38,17 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
   // ===== SITE CONTENT SAVE =====
   async function saveContent(partial: Partial<SiteContent>) {
     startTransition(async () => {
-      const res = await updateSiteContent(partial)
-      if (res.success) {
-        setContent((c) => ({ ...c, ...partial }))
-        toast.success('Indhold gemt — live på hjemmesiden')
-      } else {
-        toast.error('Kunne ikke gemme')
+      try {
+        const res = await updateSiteContent(partial)
+        if (res.success) {
+          setContent((c) => ({ ...c, ...partial }))
+          toast.success('Indhold gemt — live på hjemmesiden')
+        } else {
+          toast.error(res.error || 'Kunne ikke gemme')
+        }
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'Kunne ikke gemme'
+        toast.error(message)
       }
     })
   }
@@ -71,20 +76,24 @@ export function AdminDashboard({ initialProjects, initialSteps, initialContent, 
 
   async function handleSaveProject(proj: Project) {
     startTransition(async () => {
-      await updateProject(proj.id, {
-        title: proj.title,
-        location: proj.location,
-        category: proj.category,
-        challenge: proj.challenge,
-        approach: proj.approach,
-        result: proj.result,
-        beforeImages: proj.beforeImages || [],
-        afterImages: proj.afterImages || [],
-        featuredOnHome: proj.featuredOnHome || false,
-      })
-      setProjects((prev) => prev.map((p) => (p.id === proj.id ? proj : p)))
-      setEditingProject(null)
-      toast.success('Projekt gemt')
+      try {
+        await updateProject(proj.id, {
+          title: proj.title,
+          location: proj.location,
+          category: proj.category,
+          challenge: proj.challenge,
+          approach: proj.approach,
+          result: proj.result,
+          beforeImages: proj.beforeImages || [],
+          afterImages: proj.afterImages || [],
+          featuredOnHome: proj.featuredOnHome || false,
+        })
+        setProjects((prev) => prev.map((p) => (p.id === proj.id ? proj : p)))
+        setEditingProject(null)
+        toast.success('Projekt gemt')
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Kunne ikke gemme projekt')
+      }
     })
   }
 

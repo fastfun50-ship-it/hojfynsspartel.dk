@@ -7,19 +7,31 @@ import { CMS_KEYS, DEFAULT_COLORS } from '@/types/cms'
 const DATA_DIR = path.join(process.cwd(), 'data')
 
 // In development we ALWAYS use fast local data/ JSON files (no network, no heavy deps).
-// In production we use Vercel Blob (if token present) for persistence across deploys.
+// In production we use Vercel Blob for persistence across deploys.
 const isDev = process.env.NODE_ENV === 'development'
+const isVercel = !!process.env.VERCEL
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || process.env.CMS_BLOB_READ_WRITE_TOKEN
 const BLOB_STORE_ID = process.env.BLOB_STORE_ID || process.env.CMS_BLOB_STORE_ID
 
-const USE_BLOB = !isDev && !!BLOB_TOKEN
+// Enable blob when token and/or storeId is available (OIDC-connected stores may only have storeId)
+const USE_BLOB = !isDev && !!(BLOB_TOKEN || BLOB_STORE_ID)
 
-// Ensure local data dir (dev)
+/** Shared credentials for @vercel/blob list/put/head */
+function blobAuthOptions(): { token?: string; storeId?: string } {
+  const opts: { token?: string; storeId?: string } = {}
+  // Prefer token when present (works everywhere). storeId is for OIDC on Vercel.
+  if (BLOB_TOKEN) opts.token = BLOB_TOKEN
+  if (BLOB_STORE_ID) opts.storeId = BLOB_STORE_ID
+  return opts
+}
+
 async function ensureDataDir() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true })
-  } catch {}
+  } catch {
+    // ignore
+  }
 }
 
 // ---------- Generic load/save via blob or fs ----------
@@ -27,14 +39,23 @@ async function loadJson<T>(key: string, fallback: T): Promise<T> {
   if (USE_BLOB) {
     try {
       // Dynamic import so the heavy @vercel/blob package is NEVER loaded in dev
-      const { list: blobList } = await import('@vercel/blob')
-      const listOptions: any = { prefix: key, limit: 1 }
-      if (BLOB_STORE_ID) {
-        listOptions.storeId = BLOB_STORE_ID
-      } else if (BLOB_TOKEN) {
-        listOptions.token = BLOB_TOKEN
+      const { list: blobList, head: blobHead } = await import('@vercel/blob')
+      const auth = blobAuthOptions()
+
+      // Prefer exact pathname via head (faster / more reliable than prefix list)
+      try {
+        const meta = await blobHead(key, auth)
+        if (meta?.url) {
+          const res = await fetch(meta.url, { cache: 'no-store' })
+          if (res.ok) {
+            return (await res.json()) as T
+          }
+        }
+      } catch {
+        // Not found or head failed — try list fallback
       }
-      const { blobs } = await blobList(listOptions)
+
+      const { blobs } = await blobList({ prefix: key, limit: 1, ...auth })
       if (blobs.length > 0) {
         const res = await fetch(blobs[0].url, { cache: 'no-store' })
         if (res.ok) {
@@ -46,7 +67,7 @@ async function loadJson<T>(key: string, fallback: T): Promise<T> {
     }
   }
 
-  // Fallback to local fs (dev or no blob token) — fast and offline
+  // Fallback to local fs (dev or no blob) — fast and offline
   try {
     const filePath = path.join(DATA_DIR, path.basename(key))
     const raw = await fs.readFile(filePath, 'utf8')
@@ -62,27 +83,36 @@ async function saveJson<T>(key: string, data: T): Promise<void> {
   if (USE_BLOB) {
     try {
       const { put: blobPut } = await import('@vercel/blob')
-      const putOptions: any = {
+      // access is REQUIRED by @vercel/blob put(). allowOverwrite is required for stable CMS keys.
+      await blobPut(key, json, {
+        access: 'public',
         contentType: 'application/json',
-        addRandomSuffix: false, // stable path
-        allowOverwrite: true,   // CMS intentionally overwrites stable keys like site-content.json
-      }
-      if (BLOB_STORE_ID) {
-        putOptions.storeId = BLOB_STORE_ID
-      } else if (BLOB_TOKEN) {
-        putOptions.token = BLOB_TOKEN
-      } else {
-        putOptions.access = 'public'
-      }
-      await blobPut(key, json, putOptions)
+        addRandomSuffix: false, // stable path (cms/site-content.json etc.)
+        allowOverwrite: true, // CMS always overwrites the same keys
+        ...blobAuthOptions(),
+      })
       return
     } catch (e) {
       console.error('[cms] blob save failed for', key, e)
-      // fall through to fs as last resort
+      const message = e instanceof Error ? e.message : String(e)
+      // Do NOT fall through to fs on Vercel — it does not persist and hides the real error
+      if (isVercel || !isDev) {
+        throw new Error(
+          `CMS kunne ikke gemme til Vercel Blob (${key}): ${message}. ` +
+            'Tjek BLOB_READ_WRITE_TOKEN i Vercel Environment Variables.'
+        )
+      }
+      // Local production-like run: fall through to fs
     }
   }
 
-  // fs fallback
+  if (isVercel && !USE_BLOB) {
+    throw new Error(
+      'CMS Blob er ikke konfigureret. Sæt BLOB_READ_WRITE_TOKEN (eller BLOB_STORE_ID) i Vercel → Settings → Environment Variables, og redeploy.'
+    )
+  }
+
+  // fs fallback (local dev)
   await ensureDataDir()
   const filePath = path.join(DATA_DIR, path.basename(key))
   await fs.writeFile(filePath, json, 'utf8')
