@@ -83,12 +83,20 @@ export function About({ content }: AboutProps) {
             Hvis du leder efter en, der bare hurtigt skal have opgaven overstået, er vi sandsynligvis ikke de rigtige. 
             Men hvis du vil have det gjort ordentligt – så lad os tale sammen.
           </p>
-          <a 
-            href="#kontakt" 
-            className="inline-block mt-5 text-sm font-medium text-[var(--gold)] hover:underline"
-          >
-            {about.ctaText}
-          </a>
+          <div className="mt-5 flex flex-wrap items-center gap-4">
+            <a
+              href="#kontakt"
+              className="text-sm font-medium text-[var(--gold)] hover:underline"
+            >
+              {about.ctaText}
+            </a>
+            <a
+              href={`tel:${contact.phone.replace(/\s/g, '')}`}
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+            >
+              Eller ring {contact.phone} →
+            </a>
+          </div>
         </div>
 
       </div>
