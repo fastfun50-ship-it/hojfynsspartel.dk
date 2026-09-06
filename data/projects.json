@@ -1,0 +1,23 @@
+[
+  {
+    "id": "bad-original-01",
+    "title": "Bad — original",
+    "src": "/images/bad-original-01.jpg",
+    "createdAt": "2026-09-06T00:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "rum-02",
+    "title": "Rum 02",
+    "src": "/images/rum-02.jpg",
+    "createdAt": "2026-09-05T00:00:00.000Z",
+    "order": 1
+  },
+  {
+    "id": "rum-03",
+    "title": "Rum 03",
+    "src": "/images/rum-03.jpg",
+    "createdAt": "2026-09-05T00:00:00.000Z",
+    "order": 2
+  }
+]

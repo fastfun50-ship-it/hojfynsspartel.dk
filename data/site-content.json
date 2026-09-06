@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "desktop": "/images/hero-16x9.jpg",
+    "mobile": "/images/hero-4x5.jpg",
+    "desktopWebp": "/images/hero-16x9.webp",
+    "mobileWebp": "/images/hero-4x5.webp",
+    "h1": "Rum man vil være i.",
+    "under": "Spartel og maling. Uden kompromis.",
+    "note": "Håndværk med ærlighed — flader der holder og rum der føles rigtige."
+  },
+  "ydelser": [
+    {
+      "id": "spartel",
+      "title": "Spartel",
+      "body": "Plane flader. Skarpe kanter. Underlag der tåler tiden.",
+      "image": "/images/detail-spartel.jpg"
+    },
+    {
+      "id": "maling",
+      "title": "Maling",
+      "body": "Farve med dybde. Finish der føles gennemtænkt — ikke bare dækket.",
+      "image": "/images/detail-maling.jpg"
+    },
+    {
+      "id": "finish",
+      "title": "Finish",
+      "body": "Det sidste lag. Detaljer, kanter og overflader der lukker rummet.",
+      "image": "/images/detail-finish.jpg"
+    },
+    {
+      "id": "gulv",
+      "title": "Gulv — slibning og lakering",
+      "body": "Slibning og lakering af gulve — samme niveau som vægge og finish.",
+      "image": "/images/detail-gulv.jpg"
+    }
+  ],
+  "om": {
+    "heading": "Michael og Mikkel",
+    "michael": "Michael Iversen — bygningsmaler. 15 år med spartel, maling og finish.",
+    "mikkel": "Mikkel — maling, frihåndsbeskæring og gulv.",
+    "body": "To malere fra Fyn. Vi spartler, maler og sliber gulve — privat, erhverv og boligforeninger. Flyttelejligheder, hele opgange, ét rum. Base i Vissenbjerg.",
+    "closing": "Vi arbejder med andre malermestre, når opgaven kræver flere hænder. Samme finish.",
+    "image": "/images/detail-spartel.jpg"
+  },
+  "kontakt": {
+    "phone": "21 63 17 93",
+    "email": "info@hojfynsspartel.dk",
+    "cvr": "41620730"
+  }
+}

@@ -1,0 +1,7 @@
+=== TXT ===
+{"success":false,"error":"Forkert filtype. Brug JPG, PNG eller WEBP."}
+HTTP:400
+
+=== PDF ===
+{"success":false,"error":"Forkert filtype. Brug JPG, PNG eller WEBP."}
+HTTP:400

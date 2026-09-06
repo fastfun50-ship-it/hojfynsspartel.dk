@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "response": {
+    "success": true,
+    "project": {
+      "id": "p_1788603984045",
+      "title": "Proof upload v2",
+      "src": "/uploads/projects/p_1788603984045.jpg",
+      "createdAt": "2026-09-05T10:26:24.049Z"
+    },
+    "bytes": 2088301
+  },
+  "disk": "/workspace/hfs-version2.0/public/uploads/projects/p_1788603984045.jpg",
+  "diskBytes": 2088301
+}

@@ -1,0 +1,15 @@
+node_modules
+.next
+.env*.local
+data/inquiries.json
+public/uploads/projects/*
+!public/uploads/projects/.gitkeep
+.env
+.env.local
+.vercel
+
+_gammel/
+
+data/last-book-mail.json
+evidence/last-book-mail.json
+

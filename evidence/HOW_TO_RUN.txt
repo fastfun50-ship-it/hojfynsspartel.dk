@@ -1,0 +1,6 @@
+HOW TO RUN
+cd /workspace/hfs-version2.0
+bun install
+bun run dev
+# Preview: http://127.0.0.1:3000
+# Admin: http://127.0.0.1:3000/admin/upload

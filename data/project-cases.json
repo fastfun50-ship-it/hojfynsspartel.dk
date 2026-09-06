@@ -1,0 +1,40 @@
+[
+  {
+    "id": "demo-01",
+    "title": "Rum · Vissenbjerg",
+    "type": "spartel",
+    "by": "Vissenbjerg",
+    "before": "/images/projects/foer-01.jpg",
+    "after": "/images/projects/efter-01.jpg",
+    "temporary": false,
+    "published": true,
+    "blurb": "Spartel og maling — samme vinkel før og efter.",
+    "createdAt": "2026-09-06T00:00:00.000Z",
+    "order": 1
+  },
+  {
+    "id": "case-02",
+    "title": "Indgang · facade",
+    "type": "spartel",
+    "by": "Fyn",
+    "before": "/images/projects/foer-02.jpg",
+    "after": "/images/projects/efter-02.jpg",
+    "temporary": false,
+    "published": true,
+    "blurb": "Facade og indgang — samme vinkel før og efter.",
+    "createdAt": "2026-09-06T07:40:00.000Z",
+    "order": 2
+  },
+  {
+    "id": "c_1788686757370",
+    "title": "Den Gamle Bazar",
+    "type": "spartel",
+    "by": "Odense",
+    "before": "/uploads/cases/m_1788686697892.webp",
+    "after": "/uploads/cases/m_1788686652706.webp",
+    "temporary": false,
+    "published": true,
+    "createdAt": "2026-09-06T09:25:57.370Z",
+    "order": 3
+  }
+]

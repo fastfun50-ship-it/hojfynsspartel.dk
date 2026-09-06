@@ -1,0 +1,15 @@
+Upload proof HFS v2
+Original JPEG: evidence/test-upload-9mb.jpg (~10.3 MB)
+Client-compress sim: max long side 2400, JPEG q82 -> evidence/test-upload-compressed.jpg (~2.0 MB)
+POST /api/projects/upload -> public/uploads/projects/<id>.jpg + data/projects.json
+{"success":true,"project":{"id":"p_1788603774813","title":"Upload-proof 9MB client-compress sim","src":"/uploads/projects/p_1788603774813.jpg","createdAt":"2026-09-05T10:22:54.818Z"},"bytes":2088301}
+
+
+FAIL CASE (type reject):
+=== TXT ===
+{"success":false,"error":"Forkert filtype. Brug JPG, PNG eller WEBP."}
+HTTP:400
+
+=== PDF ===
+{"success":false,"error":"Forkert filtype. Brug JPG, PNG eller WEBP."}
+HTTP:400
